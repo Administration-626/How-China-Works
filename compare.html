@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>置身事内 × 以日为鉴 · 对比阅读</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5d8a'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%23fff' font-family='serif'%3E鉴%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f7f5f1; --panel:#fffefb; --ink:#1f1c18; --ink2:#4a433b; --ink3:#8a8076;
+  --line:#e2dcd2; --line2:#d0c7b8;
+  --cn:#a8442a; --cn-deep:#8a3520; --cn-bg:#faf1ec; --cn-line:#e8cfc2;
+  --jp:#2f5d8a; --jp-deep:#244a70; --jp-bg:#eef2f7; --jp-line:#c9d6e3;
+  --amber:#c4842f; --green:#3f6b4f;
+  --shadow:0 1px 2px rgba(60,45,30,.05),0 8px 24px rgba(60,45,30,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Songti SC","SimSun","Noto Serif CJK SC",Georgia,serif;
+  font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.sans{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 26px}
+#pbar{position:fixed;left:0;top:0;height:2px;width:0;background:linear-gradient(90deg,var(--cn),var(--jp));z-index:60;transition:width .1s linear;pointer-events:none}
+
+/* ---------- HERO ---------- */
+.hero{padding:72px 0 48px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;left:-80px;top:-90px;width:320px;height:320px;
+  background:radial-gradient(circle,rgba(168,68,42,.08),transparent 68%);border-radius:50%}
+.hero::after{content:"";position:absolute;right:-90px;bottom:-110px;width:340px;height:340px;
+  background:radial-gradient(circle,rgba(47,93,138,.09),transparent 68%);border-radius:50%}
+.hero .kicker{font-size:12.5px;letter-spacing:.24em;color:var(--ink3);margin:0 0 18px;font-weight:600}
+.hero .kicker b{color:var(--cn);font-weight:600}
+.hero .kicker i{color:var(--jp);font-style:normal;font-weight:600}
+.hero h1{font-size:clamp(32px,5vw,54px);line-height:1.16;margin:0 0 10px;letter-spacing:-.02em;font-weight:800}
+.hero h1 .x{color:var(--amber);font-weight:400;margin:0 .08em}
+.hero h1 .cn{color:var(--cn)}
+.hero h1 .jp{color:var(--jp)}
+.hero .sub{font-size:clamp(15px,1.9vw,19px);color:var(--ink2);margin:0 0 26px;max-width:46em}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;padding-top:16px;border-top:1px dashed var(--line2)}
+.hero .meta b{color:var(--ink2);font-weight:600}
+.thesis{margin:28px 0 0;padding:20px 24px;background:var(--panel);border-left:3px solid var(--amber);
+  border-radius:0 12px 12px 0;box-shadow:var(--shadow);font-size:16px;line-height:1.9;color:var(--ink2)}
+.thesis em{font-style:normal;color:var(--amber);font-weight:700}
+
+/* ---------- NAV ---------- */
+nav{position:sticky;top:0;z-index:40;background:rgba(247,245,241,.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)}
+nav:not(.stuck){background:transparent;backdrop-filter:none;border-bottom-color:transparent}
+nav .wrap{display:flex;align-items:center;gap:2px;padding-top:8px;padding-bottom:8px;overflow-x:auto;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{font-size:13.5px;color:var(--ink2);text-decoration:none;padding:6px 12px;border-radius:8px;white-space:nowrap;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:.16s;flex:none}
+nav a:hover{background:#ece7de;color:var(--cn)}
+nav a.on{background:var(--ink);color:#fff}
+nav .dot{flex:none;width:5px;height:5px;border-radius:50%;background:var(--line2);margin:0 4px}
+
+/* ---------- SECTIONS ---------- */
+section{padding:64px 0 8px}
+.sec-head{margin-bottom:30px}
+.sec-head .no{font-size:12px;letter-spacing:.2em;color:var(--amber);font-weight:700;margin:0 0 8px}
+.sec-head h2{font-size:clamp(24px,3.4vw,34px);margin:0 0 8px;font-weight:800;letter-spacing:-.01em}
+.sec-head p{margin:0;color:var(--ink2);max-width:52em}
+
+/* 两本书 */
+.books{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.book{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 26px 22px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.book::before{content:"";position:absolute;left:0;top:0;right:0;height:4px}
+.book.cn::before{background:var(--cn)}
+.book.jp::before{background:var(--jp)}
+.book .tag{font-size:12px;letter-spacing:.18em;font-weight:700;margin:0 0 10px}
+.book.cn .tag{color:var(--cn)} .book.jp .tag{color:var(--jp)}
+.book h3{margin:0 0 2px;font-size:24px;font-weight:800}
+.book .author{font-size:13.5px;color:var(--ink3);margin:0 0 16px;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.book .role{font-size:16.5px;font-weight:700;line-height:1.6;margin:0 0 14px}
+.book.cn .role b{color:var(--cn-deep)} .book.jp .role b{color:var(--jp-deep)}
+.book ul{list-style:none;margin:0 0 14px;padding:0;font-size:13.5px;color:var(--ink2)}
+.book li{padding:7px 0;border-top:1px dashed var(--line);display:flex;gap:10px}
+.book li b{flex:none;color:var(--ink3);font-weight:600;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:12.5px;padding-top:2px}
+.kw{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.kw span{font-size:12px;font-family:"PingFang SC","Microsoft YaHei",sans-serif;padding:3px 10px;border-radius:20px}
+.book.cn .kw span{background:var(--cn-bg);color:var(--cn-deep);border:1px solid var(--cn-line)}
+.book.jp .kw span{background:var(--jp-bg);color:var(--jp-deep);border:1px solid var(--jp-line)}
+
+/* 命题 */
+.theses{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:26px}
+.thesis-card{border-radius:14px;padding:26px 26px 22px;position:relative;box-shadow:var(--shadow)}
+.thesis-card.cn{background:var(--cn-bg);border:1px solid var(--cn-line)}
+.thesis-card.jp{background:var(--jp-bg);border:1px solid var(--jp-line)}
+.thesis-card .from{font-size:12.5px;letter-spacing:.1em;font-weight:700;margin:0 0 12px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.thesis-card.cn .from{color:var(--cn)} .thesis-card.jp .from{color:var(--jp)}
+.thesis-card blockquote{margin:0;font-size:17px;line-height:2;font-weight:600}
+.thesis-card.cn blockquote{color:var(--cn-deep)} .thesis-card.jp blockquote{color:var(--jp-deep)}
+.thesis-card cite{display:block;margin-top:12px;font-size:12.5px;color:var(--ink3);font-style:normal;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.merge{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--amber);
+  border-radius:0 12px 12px 0;padding:18px 22px;font-size:15.5px;color:var(--ink2);line-height:1.9}
+.merge b{color:var(--amber)}
+
+/* 六题交锋 */
+.topic{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  box-shadow:var(--shadow);margin-bottom:26px}
+.topic .thead{display:flex;align-items:baseline;gap:14px;padding:18px 24px 14px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(196,132,47,.05),transparent)}
+.topic .thead .idx{font-size:13px;font-weight:800;color:var(--amber);letter-spacing:.06em}
+.topic .thead h3{margin:0;font-size:19px;font-weight:800}
+.topic .thead .hint{margin-left:auto;font-size:12.5px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.topic .cols{display:grid;grid-template-columns:1fr 1fr}
+.topic .col{padding:20px 24px}
+.topic .col.cn{border-right:1px solid var(--line)}
+.topic .col .src{font-size:12px;letter-spacing:.12em;font-weight:700;margin:0 0 8px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.col.cn .src{color:var(--cn)} .col.jp .src{color:var(--jp)}
+.topic .col p{margin:0 0 10px;font-size:14.5px;color:var(--ink2)}
+.topic .col q{font-weight:600;display:block;line-height:1.95;margin:6px 0 10px;font-size:15px}
+.col.cn q{color:var(--cn-deep)} .col.jp q{color:var(--jp-deep)}
+.topic .col .ref{font-size:12px;color:var(--ink3);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.topic .take{border-top:1px dashed var(--line2);padding:14px 24px;background:#fbf8f2;
+  font-size:14.5px;color:var(--ink2)}
+.topic .take b{color:var(--amber);font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:12.5px;
+  letter-spacing:.14em;margin-right:10px}
+
+/* 双轨时间线 */
+.tl{display:grid;grid-template-columns:1fr 168px 1fr;gap:0 10px;align-items:start}
+.tl-head{text-align:center;padding:10px 0 16px}
+.tl-head .t{font-size:16px;font-weight:800;margin:0 0 2px}
+.tl-head .s{font-size:12px;color:var(--ink3);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.tl-col.cn .t{color:var(--cn)} .tl-col.jp .t{color:var(--jp)}
+.tl-item{position:relative;padding:0 0 18px 26px;font-size:13.5px;color:var(--ink2)}
+.tl-item::before{content:"";position:absolute;left:6px;top:7px;width:9px;height:9px;border-radius:50%;
+  border:2px solid var(--panel)}
+.tl-item::after{content:"";position:absolute;left:10px;top:22px;bottom:-2px;width:1px;background:var(--line2)}
+.tl-item:last-child::after{display:none}
+.tl-col.cn .tl-item::before{background:var(--cn)}
+.tl-col.jp .tl-item::before{background:var(--jp)}
+.tl-item .y{font-weight:800;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:13.5px;
+  margin-right:6px}
+.tl-col.cn .y{color:var(--cn-deep)} .tl-col.jp .y{color:var(--jp-deep)}
+.tl-item .bk{font-size:11px;color:var(--ink3);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.tl-item p{margin:2px 0 0;line-height:1.7}
+.tl-mid{display:flex;flex-direction:column;gap:14px;padding-top:56px}
+.mid-card{background:#fbf8f2;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:12.5px;
+  color:var(--ink2);line-height:1.7}
+.mid-card b{display:block;color:var(--amber);font-size:11.5px;letter-spacing:.14em;margin-bottom:4px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.tl-note{margin:20px 0 0;font-size:12.5px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* 可信度 */
+.cred{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:24px}
+.cred .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+  box-shadow:var(--shadow)}
+.cred h4{margin:0 0 10px;font-size:16px;font-weight:800}
+.cred .card.cn h4{color:var(--cn)} .cred .card.jp h4{color:var(--jp)}
+.cred p{margin:0 0 8px;font-size:14px;color:var(--ink2)}
+.cred .lab{display:inline-block;font-size:12px;font-weight:700;padding:2px 10px;border-radius:14px;margin:0 6px 8px 0;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.card.cn .lab{background:var(--cn-bg);color:var(--cn-deep);border:1px solid var(--cn-line)}
+.card.jp .lab{background:var(--jp-bg);color:var(--jp-deep);border:1px solid var(--jp-line)}
+.notfate{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);
+  border-radius:0 12px 12px 0;padding:18px 22px;font-size:14.5px;color:var(--ink2)}
+.notfate b{color:var(--green)}
+
+/* 合读 */
+.pairs{display:flex;flex-direction:column;gap:16px;margin-bottom:26px}
+.pair{display:grid;grid-template-columns:44px 1fr 40px 1fr;gap:0 14px;align-items:stretch;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.pair .pn{display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--amber);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;background:#fbf8f2}
+.pair .cell{padding:16px 18px;font-size:13.5px;line-height:1.75;color:var(--ink2)}
+.pair .cell b{display:block;font-size:14.5px;margin-bottom:2px}
+.pair .cell.cn b{color:var(--cn)} .pair .cell.jp b{color:var(--jp)}
+.pair .vs{display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:12px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;writing-mode:vertical-rl;letter-spacing:.3em;
+  border-left:1px dashed var(--line);border-right:1px dashed var(--line);background:#fbf8f2}
+.pair .cell.cn{border-right:1px solid var(--line)}
+.pair-theme{margin:0 0 6px;font-size:16px;font-weight:800}
+.endings{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:26px}
+.end-card{border-radius:14px;padding:24px 26px;box-shadow:var(--shadow)}
+.end-card.cn{background:var(--cn-bg);border:1px solid var(--cn-line)}
+.end-card.jp{background:var(--jp-bg);border:1px solid var(--jp-line)}
+.end-card .lab{font-size:12px;letter-spacing:.16em;font-weight:700;margin:0 0 10px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.end-card.cn .lab{color:var(--cn)} .end-card.jp .lab{color:var(--jp)}
+.end-card blockquote{margin:0 0 12px;font-size:16px;font-weight:700;line-height:1.95}
+.end-card.cn blockquote{color:var(--cn-deep)} .end-card.jp blockquote{color:var(--jp-deep)}
+.end-card p{margin:0;font-size:13.5px;color:var(--ink2)}
+
+/* FOOTER */
+footer{margin-top:70px;border-top:1px solid var(--line);background:var(--panel)}
+footer .wrap{padding:34px 26px 40px}
+footer p{margin:0 0 8px;font-size:13px;color:var(--ink3);max-width:64em}
+footer b{color:var(--ink2)}
+.made{margin-top:14px;font-size:12px;color:var(--ink3);letter-spacing:.08em}
+
+@media (max-width:900px){
+  .books,.theses,.cred,.endings{grid-template-columns:1fr}
+  .topic .cols{grid-template-columns:1fr}
+  .topic .col.cn{border-right:none;border-bottom:1px solid var(--line)}
+  .tl{grid-template-columns:1fr}
+  .tl-mid{order:-1;padding-top:0;flex-direction:row;flex-wrap:wrap}
+  .mid-card{flex:1 1 45%}
+  .hero{padding:52px 0 36px}
+  section{padding:48px 0 4px}
+}
+</style>
+</head>
+<body>
+<div id="pbar"></div>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="kicker">对比阅读 · COMPARATIVE READING —— <b>置身事内</b> <i>× 以日为鉴</i></p>
+    <h1><span class="cn">机器如何运转</span><span class="x">×</span><span class="jp">减速时怎么活</span></h1>
+    <p class="sub">一本拆解中国增长机器的运转原理，一本用日本三十年的记录回答：当机器减速，落在每个行业、每个人头上的是什么。两本书都不是预测，但放在一起，正好拼出一个完整的问题。</p>
+    <div class="meta">
+      <span>对照底本：<b>兰小欢《置身事内：中国政府与经济发展》（2021）</b></span>
+      <span><b>分析师Boden《以日为鉴：衰退时代生存指南》（2025）</b></span>
+      <span>引文均出自两书原文，随注标注章节</span>
+    </div>
+    <div class="thesis">兰小欢在前言里交代了自己的方法：注重解释<em>“是什么”和“为什么”</em>，涉及“怎么办”时，只解释当下正在实施的政策和改革。Boden 的方法如出一辙——抛开宏大叙事，把日本四十年间的政策抉择逐一换算成<em>个体命运</em>。一个从体制内部往外看，一个从普通人身上往回看，两束光打在同一段历史上。</div>
+  </div>
+</div>
+
+<nav id="nav"><div class="wrap">
+  <a href="#s1">两本书</a><span class="dot"></span>
+  <a href="#s2">核心命题</a><span class="dot"></span>
+  <a href="#s3">六个交锋</a><span class="dot"></span>
+  <a href="#s4">双轨时间线</a><span class="dot"></span>
+  <a href="#s5">方法与可信度</a><span class="dot"></span>
+  <a href="#s6">怎么合读</a>
+  <span style="flex:1"></span>
+  <a href="index.html" style="color:var(--ink3)">置身事内图谱</a><span class="dot"></span>
+  <a href="riji.html" style="color:var(--jp)">以日为鉴精讲</a><span class="dot"></span>
+  <a href="policy.html" style="color:var(--ink3)">政策备忘录</a>
+</div></nav>
+
+<!-- ============ 1 两本书 ============ -->
+<section id="s1"><div class="wrap">
+  <div class="sec-head">
+    <p class="no">01 / 两本书</p>
+    <h2>教授的讲义 与 分析师的手记</h2>
+    <p>两本书的出身决定了它们各自能看见什么：一个有学术训练的纵深，一个有贴地观察的密度。</p>
+  </div>
+  <div class="books">
+    <div class="book cn">
+      <p class="tag">置身事内：中国政府与经济发展</p>
+      <h3>置身事内</h3>
+      <p class="author">兰小欢 · 复旦大学经济学院教授 · 2021年出版</p>
+      <p class="role">主线：在<b>中国</b>，政府不但是“裁判”，更是下场踢球的“运动员”——不懂政府，就不懂中国经济。</p>
+      <ul>
+        <li><b>出身</b>脱胎于复旦大学与香港中文大学（深圳）的课程讲义</li>
+        <li><b>方法</b>引用260多种文献，“严格遵循学术规范”，数据多出自《中国统计年鉴》、IMF、万得</li>
+        <li><b>视角</b>自上而下：分税制 → 土地财政 → 城投债务 → 产业政策 → 内外失衡</li>
+        <li><b>姿态</b>解释“机器为什么这样转”，立场是理解的、建设性的</li>
+      </ul>
+      <div class="kw"><span>分税制</span><span>土地财政</span><span>城投债</span><span>京东方与光伏</span><span>产能过剩</span></div>
+    </div>
+    <div class="book jp">
+      <p class="tag">以日为鉴：衰退时代生存指南</p>
+      <h3>以日为鉴</h3>
+      <p class="author">分析师Boden · 网络连载整理成书 · 2025年春成书</p>
+      <p class="role">主线：日本是东亚第一个从“增长”转入“存量”的经济体，它走过的四十年政策抉择，是一本写给个体的<b>“职业错题本”</b>。</p>
+      <ul>
+        <li><b>出身</b>作者十余年案头研究，2024年整理发布于网络，反响巨大后成书</li>
+        <li><b>方法</b>叙事复盘为主；日本侧数据锚定总务省 e-Stat 官方统计（书末附索引），中国侧引普华永道、美世、领英等报告</li>
+        <li><b>视角</b>自下而上：失业潮 → 学历贬值 → 考公、教师、医生、工程师 → 医药寒冬 → 全民出海</li>
+        <li><b>姿态</b>回答“减速后个体怎么办”，立场是求生的、具体的</li>
+      </ul>
+      <div class="kw"><span>就业冰河期</span><span>学历崩溃</span><span>考公热起落</span><span>医药寒冬</span><span>全民出海</span></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============ 2 核心命题 ============ -->
+<section id="s2"><div class="wrap">
+  <div class="sec-head">
+    <p class="no">02 / 核心命题</p>
+    <h2>两句话，两个方向</h2>
+    <p>两本书各用一句话立起了整本书的方向——一个向内解释体制，一个向前推演个体。</p>
+  </div>
+  <div class="theses">
+    <div class="thesis-card cn">
+      <p class="from">置身事内 · 前言</p>
+      <blockquote>“在我国，政府不但影响‘蛋糕’的分配，也参与‘蛋糕’的生产，所以我们不可能脱离政府谈经济。”</blockquote>
+      <cite>——全书主角“既不是微观的价格机制，也不是宏观的经济周期，而是政府和政策”</cite>
+    </div>
+    <div class="thesis-card jp">
+      <p class="from">以日为鉴 · 前言</p>
+      <blockquote>“作为东亚第一个从‘增长型社会’走向‘存量型社会’的经济体……这40年中的变化其实就是一本‘人生参考书’，或者说是‘职业错题本’。”</blockquote>
+      <cite>——作者自陈：抛开宏大叙事，“站在普通人的角度去探寻这轮长达40年经济周期的借鉴意义”</cite>
+    </div>
+  </div>
+  <div class="merge"><b>合起来看：</b>置身事内把“国家为什么这样选”讲清楚了；以日为鉴把“选完之后，代价落在谁头上”讲清楚了。前者是后者的前提——看不懂土地财政与债务的逻辑，就读不懂日本那代大学生、公务员、医生身上究竟发生了什么。</div>
+</div></section>
+
+<!-- ============ 3 六个交锋 ============ -->
+<section id="s3"><div class="wrap">
+  <div class="sec-head">
+    <p class="no">03 / 六个交锋</p>
+    <h2>同一话题，两种写法</h2>
+    <p>六组两书共同触碰的话题。左侧为置身事内，右侧为以日为鉴，每题附一行合读笔记。</p>
+  </div>
+
+  <div class="topic">
+    <div class="thead"><span class="idx">壹</span><h3>房子：财政引擎，还是债务之锚</h3><span class="hint">土地 · 房价 · 居民负债</span></div>
+    <div class="cols">
+      <div class="col cn">
+        <p class="src">置身事内 · 第二章 / 第五章</p>
+        <q>“‘土地财政’的实质是‘房地产财政’……2018年‘土地财政’收入相当于地方公共预算收入的89%，是名副其实的‘第二财政’。”</q>
+        <p>并提醒读者，中国人财富的压舱石是房子：“2019年末……接近六成家庭有负债，平均债务收入比为1.6，也就是说债务相当于1.6倍的家庭年收入。”</p>
+        <p class="ref">图2-4、图5-2 数据源：历年《中国国土资源统计年鉴》、IMF全球债务数据库</p>
+      </div>
+      <div class="col jp">
+        <p class="src">以日为鉴 · 第一章 / 第二章</p>
+        <q>“日本家庭平均负债是年收入的3.1倍，即每个家庭都透支了未来3年的收入。”</q>
+        <p>正因为怕这批背房贷的老员工失业断供、引爆银行，日本才选择死保存量就业——而“没有谁可以想象房价实际触底的时间竟然要到20年后”。</p>
+        <p class="ref">第二章；另见第一章“1991年底……东京地区6个月内土地价格下挫超过8%”</p>
+      </div>
+    </div>
+    <div class="take"><b>合读</b>房价在这边是财政的发动机，在那边是拖垮两代人资产负债表的锚。压舱石与累赘之间，隔着的只是价格的方向。</div>
+  </div>
+
+  <div class="topic">
+    <div class="thead"><span class="idx">贰</span><h3>债务与僵尸企业</h3><span class="hint">杠杆 · 银行 · 输血</span></div>
+    <div class="cols">
+      <div class="col cn">
+        <p class="src">置身事内 · 第六章</p>
+        <q>“2018年末，我国债务总量占比达到GDP的258%：其中居民债务为54%，政府债务为51%，非金融企业为154%。”</q>
+        <p>并警告：“低效率乃至亏损的国企或大中型私企，若不能破产重组，常年依靠外力‘输血’，挤占有限的信贷资源，变成‘僵尸企业’，就会拉低经济整体效率，推升宏观债务负担。”</p>
+        <p class="ref">图6-3 对比中、美、德、日四国各部门债务</p>
+      </div>
+      <div class="col jp">
+        <p class="src">以日为鉴 · 第一章</p>
+        <q>“最高峰时，僵尸企业数量占到日本企业总数的20%，哪怕是到了35年后的今天，日本平均每6家企业中还有一家是僵尸企业。”</q>
+        <p>保就业豁免的债务“可能高达6 000亿美元”，结果是“日本为了保住就业市场，最终搭上了整个银行金融体系”——1997年山一证券破产，1998年单月破产1 820家企业。</p>
+        <p class="ref">第一章及拓展阅读“住专危机与银行破产潮”</p>
+      </div>
+    </div>
+    <div class="take"><b>合读</b>置身事内把僵尸企业当作一个待改革的病灶来分析；以日为鉴则展示了放任病灶十年之后写成的完整病历。</div>
+  </div>
+
+  <div class="topic">
+    <div class="thead"><span class="idx">叁</span><h3>保就业，还是保出清</h3><span class="hint">失业 · 代价由谁承担</span></div>
+    <div class="cols">
+      <div class="col cn">
+        <p class="src">置身事内 · 第七章</p>
+        <p>置身事内复盘的是中国式的稳增长：投资与债务驱动。它对其浪费面的批评毫不客气——</p>
+        <q>“但若政府不断挖了修、修了再挖，或干脆把路修到人迹罕至之处，经济账就算不回来了……虽然修路时的GDP上升了，但实际资源是被浪费掉了。”</q>
+        <p class="ref">第七章第一节“低消费与产能过剩”</p>
+      </div>
+      <div class="col jp">
+        <p class="src">以日为鉴 · 第一章</p>
+        <q>“日本保就业的成果，是建立在牺牲长期发展与一代人利益的基础上所取得的。”</q>
+        <p>“十年间日本大学生就业率从85%迅速下滑到2003年的55%”；企业不再培养新人，“本质上，日本是以牺牲了一代大学生的发展为代价，才维持了就业市场的相对稳定。”</p>
+        <p class="ref">第一章第五节“就业冰河时期的到来”</p>
+      </div>
+    </div>
+    <div class="take"><b>合读</b>两种“稳”法，两种代价：这一边的代价记在资产负债表上，那一边的代价记在一代人的履历上。</div>
+  </div>
+
+  <div class="topic">
+    <div class="thead"><span class="idx">肆</span><h3>产业政策：工具无罪，成败在人</h3><span class="hint">京东方 · 光伏 × 研究院倍增计划</span></div>
+    <div class="cols">
+      <div class="col cn">
+        <p class="src">置身事内 · 第四章</p>
+        <p>用京东方与光伏两个案例说明政府投资如何撬动产业，但拒绝公式化结论——</p>
+        <q>“大到经济发展模式、小到具体产业政策，不存在脱离了具体场景、放之四海而皆准的答案，必须具体问题具体分析。”</q>
+        <p class="ref">第四章结语</p>
+      </div>
+      <div class="col jp">
+        <p class="src">以日为鉴 · 第六章</p>
+        <p>提供了一个完整的失败样本：1991年《研究院倍增计划》扩招硕博逾百万，为“科学立国”储备人才——</p>
+        <q>“‘科学立国’战略失败后……大扩招后博士生就业率连续9年低于60%。”</q>
+        <p>最终催生社会名词“高学历贫穷”，2007年以后“日本大学生开始拒绝读研考博，日本曾经稳居世界第三的科研体系走向崩塌”。</p>
+        <p class="ref">第六章及拓展阅读“博士远离”</p>
+      </div>
+    </div>
+    <div class="take"><b>合读</b>同一个工具，成败取决于产业周期与配套是否接得住，而不是取决于愿望的强度。</div>
+  </div>
+
+  <div class="topic">
+    <div class="thead"><span class="idx">伍</span><h3>学历、考公与“铁饭碗”的周期</h3><span class="hint">教育回报率 · 考公热起落</span></div>
+    <div class="cols">
+      <div class="col cn">
+        <p class="src">置身事内 · 第七章（间接涉及）</p>
+        <p>置身事内不直接讨论学历，但它解释了家庭为何被迫高储蓄重投入教育：“地方政府‘重土地轻人’的发展模式将大量资源用在了基础设施建设和招商引资上，民生支出比如公立教育和卫生支出相对不足……家庭需要提高储蓄以应对相关支出。”</p>
+        <p class="ref">第七章第一节“居民高储蓄”</p>
+      </div>
+      <div class="col jp">
+        <p class="src">以日为鉴 · 第五章 / 第七章</p>
+        <q>“后来这种学历快速贬值的现象，被日本社会称为‘学历崩溃’，最终与‘中产崩溃’以及‘金融崩溃’，统称为‘平成三大崩溃’。”</q>
+        <p>考公热的轨迹同样完整：1995年报考65万，“是泡沫时期的两倍还多”；直到“短短十年，日本就从大手企业年薪千万，变成了地方考公年薪千万”；而“2023年日本公务员报考录取比例已经降为1:3，录取难度创下30年来新低”。</p>
+        <p class="ref">第五章、第七章</p>
+      </div>
+    </div>
+    <div class="take"><b>合读</b>以日为鉴补上了置身事内没有展开的一环：紧缩年代里，“人力资本”这项资产的贬值速度可能比任何资产都快。</div>
+  </div>
+
+  <div class="topic">
+    <div class="thead"><span class="idx">陆</span><h3>消费不足与出海：同一枚硬币的两面</h3><span class="hint">内需 · 产能输出 · 普通人的机会</span></div>
+    <div class="cols">
+      <div class="col cn">
+        <p class="src">置身事内 · 第七章</p>
+        <q>“在2018年GDP中，居民最终消费占比只有44%，而美国这一比率将近70%，欧盟和日本也在55%左右。”</q>
+        <p>由此推出宏观结论：“从宏观角度看，对外贸易失衡也是内部结构失衡的延续。”产能必须外输，冲突随之而来。</p>
+        <p class="ref">图7-2 数据源：《中国统计年鉴2020》</p>
+      </div>
+      <div class="col jp">
+        <p class="src">以日为鉴 · 第十四 / 十五章</p>
+        <p>同一逻辑的微观版本：内需塌缩逼出全民出海——“截至2022年末，日本的海外净资产达到了418万亿日元”，由此形成“海外再造日本”；“日本上市公司海外实现利润接近总利润的60%”。</p>
+        <q>“目前我国境内外收入增长差已经达到14%，非常接近日本当年全面出海潮启动的阈值。”</q>
+        <p>作者据此判断“2024年就是真正意义上的中国出海元年”；而当前“2023年上半年中国境内上市公司海外总利润为3398亿元，仅占总利润的8.8%”，在他看来这不是坏消息，恰是“海外利润端可能有5倍以上的增长空间”的依据。</p>
+        <p class="ref">第十四章（数据源：大和证券）、第十五章（数据源：普华永道、美世、领英）</p>
+      </div>
+    </div>
+    <div class="take"><b>合读</b>宏观上是失衡与再平衡，微观上是普通人换一个市场谋生。在“出海”这个话题上，两本书罕见地指向了同一个出口。</div>
+  </div>
+</div></section>
+
+<!-- ============ 4 双轨时间线 ============ -->
+<section id="s4"><div class="wrap">
+  <div class="sec-head">
+    <p class="no">04 / 双轨时间线</p>
+    <h2>日本的三十年 与 中国的三十年</h2>
+    <p>左轨为《以日为鉴》中的日本，右轨为两书中的中国。中间灰色卡片只是阅读参照，<b>不是历史等号</b>。</p>
+  </div>
+  <div class="tl">
+    <div class="tl-col jp">
+      <div class="tl-head"><p class="t">日本 · 以日为鉴</p><p class="s">1989 — 2024</p></div>
+      <div class="tl-item"><span class="y">1989</span><span class="bk">第一章</span><p>CI指数见顶114；全民笃信“未实现的收益”，企业逆势加产能、居民加仓抄底</p></div>
+      <div class="tl-item"><span class="y">1991</span><span class="bk">第六章</span><p>《研究院倍增计划》启动，硕博大扩招为“科学立国”储备人才</p></div>
+      <div class="tl-item"><span class="y">1993</span><span class="bk">第一章</span><p>就业危机元年：GDP自1974年来首次负增长，失业率跳涨，“就业冰河期”开始</p></div>
+      <div class="tl-item"><span class="y">1994</span><span class="bk">第三 / 十四章</span><p>《新技术立国战略》发布，史称“出海元年”；乡村大基建同步启动分流失业</p></div>
+      <div class="tl-item"><span class="y">1995</span><span class="bk">第七章</span><p>公务员报考65万，考公热点燃；住专坏账达8.1万亿日元</p></div>
+      <div class="tl-item"><span class="y">1996</span><span class="bk">第二 / 五章</span><p>修改《工人派遣法》，校招制度废除——终身雇佣自此与大学生无缘</p></div>
+      <div class="tl-item"><span class="y">1997-98</span><span class="bk">第一 / 二章</span><p>山一证券破产，银行破产潮爆发；次年单月破产1 820家企业</p></div>
+      <div class="tl-item"><span class="y">2000</span><span class="bk">第二 / 三章</span><p>平成大合并启动，返乡潮终结，“超级就业冰河期”来临</p></div>
+      <div class="tl-item"><span class="y">2002</span><span class="bk">第十二章</span><p>新药定价改革，医药复兴开始；《研究院倍增计划》落幕</p></div>
+      <div class="tl-item"><span class="y">2003</span><span class="bk">第一 / 八章</span><p>大学生就业率55%触底；教师身份改制，降薪潮开启</p></div>
+      <div class="tl-item"><span class="y">2004</span><span class="bk">第十三章</span><p>介护保险与DPC支付改革，医疗体系一分为二</p></div>
+      <div class="tl-item"><span class="y">2005</span><span class="bk">第十四章</span><p>非制造业出海投资首超制造业，制造业出海的黄金十年关闭</p></div>
+      <div class="tl-item"><span class="y">2023</span><span class="bk">第七章</span><p>公务员报录比降至1:3，考公热彻底退烧；次年访日游客突破3 000万人次</p></div>
+    </div>
+    <div class="tl-mid">
+      <div class="mid-card"><b>阅读参照 一</b>地产与财政深度绑定之后，价格的方向决定整台机器的体温。</div>
+      <div class="mid-card"><b>阅读参照 二</b>下行期的第一选择都是“稳”：一边靠投资与债务，一边靠保就业与护送船队——账单都推迟了，没有消失。</div>
+      <div class="mid-card"><b>阅读参照 三</b>内需不足的时代，出海先后成为两代人的增量赛道：日本1994，中国2024。</div>
+    </div>
+    <div class="tl-col cn">
+      <div class="tl-head"><p class="t">中国 · 两书并观</p><p class="s">1994 — 2024</p></div>
+      <div class="tl-item"><span class="y">1994</span><span class="bk">置身事内·第二章</span><p>分税制改革，地方另谋财源，“土地财政”就此登场</p></div>
+      <div class="tl-item"><span class="y">1998</span><span class="bk">置身事内·第二章</span><p>住房商品化改革启动，商品房与房地产时代拉开大幕</p></div>
+      <div class="tl-item"><span class="y">2002</span><span class="bk">置身事内·第二章</span><p>“招拍挂”制度确立，土地出让收入激增，2003年即达地方公共预算收入的55%</p></div>
+      <div class="tl-item"><span class="y">2008</span><span class="bk">置身事内·第六章</span><p>“4万亿”计划，债务扩张起点，融资平台、房企、居民杠杆同时攀升</p></div>
+      <div class="tl-item"><span class="y">2015</span><span class="bk">置身事内·第六章</span><p>棚改货币化去库存，房价进一步上涨，债务再度加速</p></div>
+      <div class="tl-item"><span class="y">2016</span><span class="bk">置身事内·第六章</span><p>“房住不炒”首次提出，房地产调控全面收紧</p></div>
+      <div class="tl-item"><span class="y">2018</span><span class="bk">置身事内·第六 / 七章</span><p>债务总量达GDP的258%；居民最终消费占GDP仅44%——结构失衡的两个刻度</p></div>
+      <div class="tl-item"><span class="y">2020</span><span class="bk">置身事内·第六章</span><p>“三道红线”出台，房企融资戴上限；同年“资管新规”拧紧影子银行总闸</p></div>
+      <div class="tl-item"><span class="y">2021</span><span class="bk">以日为鉴·第十四章</span><p>“自2021年至今，经济正在承受结构性改革”——作者以此为全书中国问题的起点</p></div>
+      <div class="tl-item"><span class="y">2023</span><span class="bk">以日为鉴·第十五章</span><p>民企海外并购结束三连降，反弹至120亿美元；比亚迪等新能源企业开启出海浪潮</p></div>
+      <div class="tl-item"><span class="y">2024</span><span class="bk">以日为鉴·第十五章</span><p>上市公司境内外收入增速差达14%，接近日本当年阈值——“中国出海元年”</p></div>
+    </div>
+  </div>
+  <p class="tl-note">注：右轨1994—2020年事件出自《置身事内》，2021年之后出自《以日为鉴》的观察。中间卡片为阅读联想，两国的制度起点、人口结构与全球环境并不同，不能画等号。</p>
+</div></section>
+
+<!-- ============ 5 方法与可信度 ============ -->
+<section id="s5"><div class="wrap">
+  <div class="sec-head">
+    <p class="no">05 / 方法与可信度</p>
+    <h2>引用什么，如何核对</h2>
+    <p>两本书的成书路径不同，数据纪律也不同。合读时心里要有这本账。</p>
+  </div>
+  <div class="cred">
+    <div class="card cn">
+      <h4>置身事内：学术出版的纪律</h4>
+      <p><span class="lab">文献</span>前言致谢说明引用260多种文献，绝大多数发表于2010年之后。</p>
+      <p><span class="lab">数据</span>图表均注明出处：《中国统计年鉴》、IMF全球债务数据库、万得、中国人民银行调查等；常见数据直接来自统计年鉴。</p>
+      <p><span class="lab">姿态</span>作者自陈“力求简明扼要，突出主要逻辑和重点事实”，且“严格遵循学术规范”，“可用作大学相关课程的参考资料”。</p>
+    </div>
+    <div class="card jp">
+      <h4>以日为鉴：复盘叙事的底账</h4>
+      <p><span class="lab">数据</span>书末附《数据引用说明》：日本侧数据锚定总务省 e-Stat 官方统计（学校基本调查、公务员调查、医疗调查等，附索引链接），另附参考文献章节。</p>
+      <p><span class="lab">中国侧</span>第十四、十五章数据引自普华永道、美世、领英、猎聘、商务部等机构报告与统计。</p>
+      <p><span class="lab">提醒</span>成书自网络连载整理，叙事密度高于表格密度，个别数字系转述；引用时以书中标注的原始统计索引为准，宜存一分核对之心。</p>
+    </div>
+  </div>
+  <div class="notfate"><b>两本书都不是宿命论。</b>置身事内在第八章强调中国政治经济体制的三大“制度禀赋”——“掌握大量资源并可以自主行动的地方政府，协调和控制能力强的中央政府，以及人力资本雄厚和组织完善的官僚体系”，并提醒“后发优势”可能变成“后发劣势”，关键在能否转向“探索创新模式”。以日为鉴则用数据说明：中国上市公司海外利润占比仅8.8%（日本约60%），在作者眼里这是“海外利润端可能有5倍以上的增长空间”的依据。书名是“鉴”，不是“谶”。</div>
+</div></section>
+
+<!-- ============ 6 怎么合读 ============ -->
+<section id="s6"><div class="wrap">
+  <div class="sec-head">
+    <p class="no">06 / 怎么合读</p>
+    <h2>三组配对，两种结尾</h2>
+    <p>如果只读一对，读哪对；如果读完想留一句话，留哪句。</p>
+  </div>
+  <div class="pairs">
+    <div class="pair">
+      <div class="pn">一</div>
+      <div class="cell cn"><span class="pair-theme">机器的燃料</span><b>置身事内 · 第二章《财税与政府行为》</b>分税制如何逼出土地财政，土地财政如何长成“第二财政”。</div>
+      <div class="vs">对照</div>
+      <div class="cell jp"><b>以日为鉴 · 第一篇（第一、二章）</b>同一条燃料管线熄火之后：地价二十年触底，3.1倍家庭负债，以及“保老员工”还是“保大学生”的抉择。</div>
+    </div>
+    <div class="pair">
+      <div class="pn">二</div>
+      <div class="cell cn"><span class="pair-theme">减速的账单</span><b>置身事内 · 第六章《债务与风险》＋第七章</b>258%的宏观杠杆，僵尸企业与银行风险的传导链，消费不足的结构根源。</div>
+      <div class="vs">对照</div>
+      <div class="cell jp"><b>以日为鉴 · 第二、三篇</b>账单落到人身上的样子：冰河世代的一生，“平成三大崩溃”之学历崩溃，考公热从狂热到寂灭。</div>
+    </div>
+    <div class="pair">
+      <div class="pn">三</div>
+      <div class="cell cn"><span class="pair-theme">换道的机会</span><b>置身事内 · 第七章第三节《再平衡与国内大循环》</b>失衡的宏观出口：双循环与再平衡的政策设计。</div>
+      <div class="vs">对照</div>
+      <div class="cell jp"><b>以日为鉴 · 第五篇（第十四、十五章）</b>失衡的微观出口：出海三步走、本土化十年窗口，“2024年就是真正意义上的中国出海元年”。</div>
+    </div>
+  </div>
+
+  <div class="endings">
+    <div class="end-card cn">
+      <p class="lab">置身事内 · 结束语</p>
+      <blockquote>“生活过得好一点，比大多数宏伟更宏伟。”</blockquote>
+      <p>作者写完四十年增长机器的全景之后，落点是一个经济学家的朴素信念：“相信中国会更好。”——这是发展的信念。</p>
+    </div>
+    <div class="end-card jp">
+      <p class="lab">以日为鉴 · 前言（引罗曼·罗兰）</p>
+      <blockquote>“世界上只有一种英雄主义，就是看清生活的真相之后依然热爱它。”</blockquote>
+      <p>全书以《一碗阳春面》的两代读者作结：“当一代人发现，曾经温暖他们的面汤不过是上一代人用债务煮沸的幻象时，《一碗阳春面》便成了丈量现实与理想间冰冷距离的标尺。”——这是求生的清醒。</p>
+    </div>
+  </div>
+  <div class="merge"><b>留一句话：</b>发展的信念与求生的清醒并不矛盾——前者回答“这台机器还值不值得押注”，后者回答“如果它减速，我怎么安排自己”。两本书各自写完，恰好互为注脚；就像以日为鉴结语里说的：“潮水退去时，沙滩上留下的贝壳纹路各异，却都藏着同一片大海的呜咽与回响。”</div>
+</div></section>
+
+<footer><div class="wrap">
+  <p><b>引文核对说明</b>：本页所有引文均逐字出自两书文本（《置身事内》据工作区书源文件，《以日为鉴》据 EPUB 解析文本），随注标注章节。转述性内容以“作者”“书中”标明。</p>
+  <p><b>方法提醒</b>：对照仅为阅读参照。两国在制度起点、人口结构、全球环境上差异很大，时间线中栏的“阅读参照”卡片不构成历史等号的判断。</p>
+  <p class="made">置身事内 × 以日为鉴 · 对比阅读 · 2026-10-16</p>
+</div></footer>
+
+<script>
+(function(){
+  var bar=document.getElementById('pbar');
+  var nav=document.getElementById('nav');
+  var links=nav.querySelectorAll('a');
+  var secs=[].slice.call(document.querySelectorAll('section[id]'));
+  function onScroll(){
+    var h=document.documentElement;
+    var p=h.scrollTop/(h.scrollHeight-h.clientHeight||1);
+    bar.style.width=(p*100).toFixed(2)+'%';
+    if(h.scrollTop>140){nav.classList.add('stuck')}else{nav.classList.remove('stuck')}
+    var cur='';
+    secs.forEach(function(s){if(s.getBoundingClientRect().top<=120){cur=s.id}});
+    links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+cur)});
+  }
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+})();
+</script>
+</body>
+</html>

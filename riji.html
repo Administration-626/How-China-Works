@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>以日为鉴 · 精讲图谱</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5d8a'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%23fff' font-family='serif'%3E鉴%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f7f5f1; --panel:#fffefb; --ink:#1f1c18; --ink2:#4a433b; --ink3:#8a8076;
+  --line:#e2dcd2; --line2:#d0c7b8;
+  --jp:#2f5d8a; --jp-deep:#244a70; --jp-bg:#eef2f7; --jp-line:#c9d6e3;
+  --amber:#c4842f; --cn:#a8442a;
+  --shadow:0 1px 2px rgba(60,45,30,.05),0 8px 24px rgba(60,45,30,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Songti SC","SimSun","Noto Serif CJK SC",Georgia,serif;
+  font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,.sans{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px}
+
+/* hero */
+.hero{padding:68px 0 44px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;left:-80px;top:-90px;width:320px;height:320px;
+  background:radial-gradient(circle,rgba(47,93,138,.10),transparent 68%);border-radius:50%}
+.hero::after{content:"";position:absolute;right:-90px;bottom:-110px;width:340px;height:340px;
+  background:radial-gradient(circle,rgba(196,132,47,.08),transparent 68%);border-radius:50%}
+.hero .kicker{font-size:12.5px;letter-spacing:.24em;color:var(--ink3);margin:0 0 18px;font-weight:600}
+.hero .kicker b{color:var(--jp);font-weight:600}
+.hero h1{font-size:clamp(32px,5vw,52px);line-height:1.18;margin:0 0 10px;letter-spacing:-.02em;font-weight:800}
+.hero h1 .jp{color:var(--jp)}
+.hero .sub{font-size:clamp(15px,1.9vw,18.5px);color:var(--ink2);margin:0 0 24px;max-width:44em}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;padding-top:16px;border-top:1px dashed var(--line2)}
+.hero .meta b{color:var(--ink2);font-weight:600}
+.thesis{margin:26px 0 0;padding:20px 24px;background:var(--panel);border-left:3px solid var(--jp);
+  border-radius:0 12px 12px 0;box-shadow:var(--shadow);font-size:16px;line-height:1.9;color:var(--ink2)}
+.thesis em{font-style:normal;color:var(--jp-deep);font-weight:700}
+.thesis .src{display:block;margin-top:8px;font-size:12.5px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* nav */
+nav{position:sticky;top:0;z-index:40;background:rgba(247,245,241,.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:2px;padding-top:8px;padding-bottom:8px;overflow-x:auto;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{font-size:13.5px;color:var(--ink2);text-decoration:none;padding:6px 12px;border-radius:8px;white-space:nowrap;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:.16s;flex:none}
+nav a:hover{background:#ece7de;color:var(--jp)}
+nav .dot{flex:none;width:5px;height:5px;border-radius:50%;background:var(--line2);margin:0 4px}
+nav .ext{color:var(--ink3)}
+
+/* sections */
+section{padding:60px 0 10px}
+.sec-head{margin-bottom:26px}
+.sec-head .no{font-size:12px;letter-spacing:.2em;color:var(--amber);font-weight:700;margin:0 0 8px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.sec-head h2{font-size:clamp(23px,3.2vw,32px);margin:0 0 8px;font-weight:800;letter-spacing:-.01em}
+.sec-head p{margin:0;color:var(--ink2);max-width:52em}
+
+/* skeleton cards */
+.parts{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:6px 0 12px}
+.part{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.part::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:var(--jp)}
+.part .no{font-size:11.5px;letter-spacing:.16em;color:var(--jp);font-weight:700;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.part h3{margin:6px 0 4px;font-size:16.5px;font-weight:800;line-height:1.4}
+.part p{margin:0;font-size:12.8px;color:var(--ink3);line-height:1.65}
+.part .ch{display:block;margin-top:8px;font-size:11.5px;color:var(--jp-deep);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* lecture blocks */
+.lec{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.blk{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px 18px;
+  box-shadow:var(--shadow)}
+.blk h3{margin:0 0 10px;font-size:19px;font-weight:800}
+.blk h3 small{font-size:12.5px;color:var(--ink3);font-weight:400;margin-left:8px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.blk p{margin:0 0 10px;color:var(--ink2);font-size:14.5px}
+.blk p b{color:var(--ink)}
+.blk q{quotes:"「" "」";color:var(--jp-deep)}
+.blk .where{display:block;font-size:12px;color:var(--ink3);margin-top:2px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.blk .nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:12px 0 4px}
+.blk .n{background:var(--jp-bg);border:1px solid var(--jp-line);border-radius:10px;padding:10px 12px 8px}
+.blk .n .v{font-size:19px;font-weight:800;color:var(--jp-deep);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.blk .n .v small{font-size:.55em;font-weight:600}
+.blk .n .k{font-size:11.8px;color:var(--ink3);margin-top:2px;line-height:1.5;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.bigq{margin:4px 0 12px;padding:14px 18px;background:var(--jp-bg);border-left:3px solid var(--jp);
+  border-radius:0 10px 10px 0;font-size:15px;line-height:1.9;color:var(--jp-deep)}
+.bigq .where{display:block;margin-top:6px;font-size:12px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* timeline */
+.tl{margin-top:6px}
+.trow{display:grid;grid-template-columns:130px 1fr;gap:18px;padding:13px 0;border-bottom:1px dashed var(--line2)}
+.trow:last-child{border-bottom:none}
+.trow .y{font-size:15.5px;font-weight:800;color:var(--jp-deep);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.trow .y.hot{color:var(--amber)}
+.trow p{margin:0;color:var(--ink2);font-size:14.2px}
+
+/* method */
+.method{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.mrow{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;font-size:14px;color:var(--ink2)}
+.mrow b{color:var(--ink)}
+.mrow .t{font-weight:800;margin:0 0 6px;font-size:15.5px}
+
+/* series */
+.series{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.slink{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+  text-decoration:none;color:var(--ink);box-shadow:var(--shadow);transition:.15s;display:block}
+.slink:hover{transform:translateY(-2px);border-color:var(--jp-line)}
+.slink .st{font-size:12px;letter-spacing:.14em;color:var(--ink3);margin:0 0 4px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.slink h3{margin:0;font-size:16.5px;font-weight:800}
+.slink h3.cn{color:var(--cn)} .slink h3.jp{color:var(--jp)} .slink h3.ag{color:#3f6b4f}
+.slink p{margin:4px 0 0;font-size:13px;color:var(--ink3)}
+
+footer{padding:36px 0 44px;color:var(--ink3);font-size:13px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+footer a{color:var(--jp);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.veri{margin-top:16px;font-size:13px;color:var(--ink3);line-height:1.8}
+
+@media(max-width:860px){
+  .parts{grid-template-columns:repeat(2,1fr)}
+  .lec,.method,.series{grid-template-columns:1fr}
+  .trow{grid-template-columns:1fr;gap:2px}
+  .blk .nums{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">阅读图谱系列 · 之二 · <b>精讲</b></p>
+    <h1>以日为鉴<span class="jp"> · 精讲图谱</span></h1>
+    <p class="sub">分析师 Boden 著《以日为鉴：衰退时代生存指南》——五篇十五章，一部日本泡沫破裂后三十年的复盘叙事。每一段"日本体验"，都在回答同一个问题：如果轮到我们。</p>
+    <div class="thesis">
+      泡沫破裂不是一天的事，而是一条三十年长的因果链：<em>保就业</em>压出僵尸企业与就业冰河世代，<em>保增长</em>压出学历贬值与考公热，<em>财政控费</em>压出医疗崩坏与医药寒冬——而普通人的出路，最后被证明只有一条：跟着产业出海。
+      <span class="src">—— 本页概括 · 底本为 EPUB 全文（15 章 + 后记 + 结语，约 11.7 万字）</span>
+    </div>
+    <div class="meta">
+      <span><b>底本</b>《以日为鉴：衰退时代生存指南》（分析师 Boden）EPUB 全文解析</span>
+      <span><b>数据锚点</b>文部科学省 · 厚生劳动省 · 总务省 e-Stat · OECD · 日本海外事业活动基本调查</span>
+      <span><b>性质</b>单文件离线页 · 引文逐字可溯源</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#map">全书骨架</a><span class="dot"></span>
+    <a href="#p1">一 · 保就业的代价</a><span class="dot"></span>
+    <a href="#p2">二 · 学历贬值</a><span class="dot"></span>
+    <a href="#p3">三 · 就业众生相</a><span class="dot"></span>
+    <a href="#p4">四 · 医疗体系</a><span class="dot"></span>
+    <a href="#p5">五 · 全民出海</a><span class="dot"></span>
+    <a href="#tl">时间线</a><span class="dot"></span>
+    <a href="#method">方法与可信度</a>
+    <span style="flex:1"></span>
+    <a class="ext" href="index.html">置身事内图谱</a><span class="dot"></span>
+    <a class="ext" href="compare.html">两书对比</a><span class="dot"></span>
+    <a class="ext" href="policy.html">政策备忘录</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<section id="map">
+  <div class="sec-head">
+    <p class="no">全书骨架</p>
+    <h2>五篇十五章：从宏观决策到个人命运</h2>
+    <p>这本书的写法是倒过来的：先讲政府当年怎么做（篇一），再看这批决定如何压在一代人身上（篇二、篇三），然后看系统怎么修复（篇四），最后回答"出路在哪"（篇五）。</p>
+  </div>
+  <div class="parts">
+    <div class="part"><p class="no">篇一</p><h3>失业潮下的决策</h3><p>政府视角：保就业还是保发展，救老员工还是救大学生。</p><span class="ch">第一至三章</span></div>
+    <div class="part"><p class="no">篇二</p><h3>无法与自己和解的一代人</h3><p>个人视角：就业冰河世代的一生，学历贬值的二十年。</p><span class="ch">第四至六章</span></div>
+    <div class="part"><p class="no">篇三</p><h3>就业众生相</h3><p>行业切片：考公、教师、医生、工程师——四条赛道的兴衰。</p><span class="ch">第七至十章</span></div>
+    <div class="part"><p class="no">篇四</p><h3>老龄化冲击的医疗体系</h3><p>系统修复：医药寒冬、医药复兴、医疗再生改革。</p><span class="ch">第十一至十三章</span></div>
+    <div class="part"><p class="no">篇五</p><h3>失落经济下的全民出海潮</h3><p>出路：海外再造日本，以及中国的机遇期。</p><span class="ch">第十四、十五章</span></div>
+  </div>
+  <p style="color:var(--ink3);font-size:13px">另有前言（写作动机：书中现象清单——"返乡潮""考公热""学历贬值""高学历贫穷""医疗崩坏""临时工时代"，以及"啃老族""无缘社会""老后破产""女性贫穷"等社会名词）、后记（两代日本读者对同一故事的不同共鸣）与结语（周期论）。</p>
+</section>
+
+<section id="p1">
+  <div class="sec-head">
+    <p class="no">精讲之一 · 篇一（第一至三章）</p>
+    <h2>保就业的代价：失业率与一代人的置换</h2>
+    <p>全书最核心的一组数据关系：宏观失业率被死死按住，代价记在应届大学生头上。</p>
+  </div>
+  <div class="lec">
+    <div class="blk">
+      <h3>冰河期的由来<small>第一章</small></h3>
+      <p>1991 年泡沫破裂后，厚生省的年度劳动经济报告画风突变：<q>1993年厚生省的劳动经济报告开篇便是"失业动向：各行业岗位需求持续锐减"</q>——而两年前它讨论的还是劳动力短缺。日本由此开启<q>为期十余年的就业率保卫战</q>，这段时间就是全书反复出现的"就业冰河期"。</p>
+      <div class="nums">
+        <div class="n"><div class="v">&lt;5<small>%</small></div><div class="k">失业率被压制的上限</div></div>
+        <div class="n"><div class="v">85→55<small>%</small></div><div class="k">大学生就业率 1993→2003</div></div>
+        <div class="n"><div class="v">8→40<small>万</small></div><div class="k">啃老族数量十年间</div></div>
+      </div>
+      <p>关键句：<q>日本在就业冰河时期虽然一直将失业率压制在5%以下，但大学生的就业率却长期低于60%。本质上，日本是以牺牲了一代大学生的发展为代价，才维持了就业市场的相对稳定。</q></p>
+      <span class="where">第一章；数据源：厚生劳动省统计</span>
+    </div>
+    <div class="blk">
+      <h3>僵尸企业：最小的一笔代价<small>第一章</small></h3>
+      <p>为保就业，银行向本应出清的企业持续输血，制造了"僵尸企业"（无法以主营业务利润支付贷款利息、只能靠银行贷款续命）：<q>最高峰时，僵尸企业数量占到日本企业总数的20%，哪怕是到了35年后的今天，日本平均每6家企业中还有一家是僵尸企业</q>。典型是东芝——<q>曾经是全球第一大电脑生产商，但如今已经成为日本最大的僵尸企业</q>。</p>
+      <p>但作者认为这只是最小的一笔账：<q>日本将海量资金用于救助企业而不是用来发展科技，而这不仅连累了金融体系，也断送了日本高科技产业的未来</q>。</p>
+      <span class="where">第一章</span>
+    </div>
+    <div class="blk">
+      <h3>为什么不敢动刀<small>第一章</small></h3>
+      <p>政府不改革就业体系的真正约束是金融：<q>经过全民炒房热潮后，日本家庭平均负债是年收入的3.1倍</q>，而<q>地产暴跌后，银行业坏账率已经逼近5%的临界点</q>——一旦打破终身雇佣制造大规模失业断供，金融体系先垮。这也是房价<q>实际触底的时间竟然要到20年后</q>的时代底色。</p>
+      <span class="where">第一章</span>
+    </div>
+    <div class="blk">
+      <h3>延缓战术与回城潮<small>第二、三章</small></h3>
+      <p>第一轮缓兵之计：<q>1992年至1995年间，通过乡村分流与扩招两个措施，至少延缓了约90万大学生进入就业市场</q>——靠大基建在乡村造岗位。1996 年基建一停，岗位消亡，<q>仅东京就新增了27万人口，其中70%是毕业5年内的大学生</q>，全学历段待业总数达 80 万。回不去的乡村、留不下的都市，诞生了"漂流一族"。</p>
+      <p>2007 年校招恢复、就业率回到 70%，但作者补了一刀：<q>就业冰河时期的学生们基本都已经毕业超过10年，即使校招恢复，又与已经做了10年临时工的他们有何关系！</q></p>
+      <span class="where">第二、三章</span>
+    </div>
+  </div>
+</section>
+
+<section id="p2">
+  <div class="sec-head">
+    <p class="no">精讲之二 · 篇二（第四至六章）</p>
+    <h2>学历贬值：一场以十年计的预期坍塌</h2>
+    <p>如果说篇一讲政府的选择，篇二讲的是选择如何变成一代人的人生轨迹。</p>
+  </div>
+  <div class="lec">
+    <div class="blk">
+      <h3>《研究院倍增计划》：一次自信的扩招<small>第六章</small></h3>
+      <div class="bigq"><q>大扩招后博士生就业率连续9年低于60%</q>——以 2007 年为例，当年毕业 15973 名博士，仅 9167 人找到工作，其中文科与社科类博士就业率不足 40%。
+        <span class="where">第六章；数据源：文部科学省《学校基本调查》</span>
+      </div>
+      <p>1991 年（平成三年）启动的硕博扩招，本意是以人才储备托举"科学立国"；结果是<q>短短四年，日本私立大学硕士学历就迎来致命的贬值</q>（1996 年私立大学硕士就业率跌破 60%，为全学历段最低）。2003 年，博士入学人数达到历史最高的 1.8 万人，同年博士就业率跌至历史最低的 54.4%——扩招与贬值同时见顶。</p>
+    </div>
+    <div class="blk">
+      <h3>"博士離れ"与迟到的反思<small>第六章</small></h3>
+      <p>扩招的长期后遗症是一个社会性名词：<q>博士離れ（博士远离）</q>——社会普遍认为只有找不到工作的人才会去读博士。直到 <q>2018年，文部省首次承认日本科研处于衰退时，才对90年代"研究院倍增计划"进行反思</q>，承认"对经济复苏的过度乐观"导致未能控制好扩招比例。而故事还有下半场：<q>2024年日本再次提出博士扩招计划，这一次政府希望在20年间将博士人数增长2倍</q>。</p>
+      <span class="where">第六章</span>
+    </div>
+    <div class="blk" style="grid-column:1/-1">
+      <h3>冰河世代的现在时<small>第四章</small></h3>
+      <div class="bigq"><q>2024年，他们的平均年龄已经超过50岁，其中许多人终其30年都没有将自己的人生重新回拨到正轨，在贫穷与独身中，孤独地走过了半生。</q>
+        <span class="where">第四章——这是全书最重的一句：就业冰河期不是历史，它的人生后果仍在进行时</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="p3">
+  <div class="sec-head">
+    <p class="no">精讲之三 · 篇三（第七至十章）</p>
+    <h2>就业众生相：四条赛道的兴衰切片</h2>
+    <p>考公、教师、医生、工程师——四个当年最拥挤的"确定性选择"，各有各的剧本。</p>
+  </div>
+  <div class="lec">
+    <div class="blk">
+      <h3>考公：从神的职业到寂灭<small>第七章</small></h3>
+      <p>上行：<q>1995年日本公务员报考人数总计达到65万，是泡沫时期的两倍还多</q>，<q>就连日本第一学府东京大学的毕业生，也以成为一名公务员为荣</q>。下行：<q>日本迎来了接近10年的考公热，公务员报录比例超过1:30，但随着此后持续的低薪与工作量升高，公务员逐渐被日本年轻人所抛弃，如今报录比仅为1:3</q>。作者借此引出结论：泡沫后日本并未一直内卷，<q>大量的新兴行业崛起，日本从一个工科型社会转向多元化</q>。</p>
+      <span class="where">第七章、第十四章回顾</span>
+    </div>
+    <div class="blk">
+      <h3>教师与工程师：确定性行业的暗面<small>第八、十章</small></h3>
+      <p>教师：缩编叠加少子化，<q>1995年全国教育学院就业率仅有50%，成为当时就业率最低的专业</q>；更惨烈的是高校临时教师——<q>当时日本有整整16.8万临时教师（全教育口径），其中73%都是35岁以下的硕士与博士生</q>，年收入普遍低于 200 万日元，属绝对贫困群体。理工科：工程师失落三十年，连 80 年代最风光的商科也在 1995 年只剩顶尖大学 72% 的就业率——<q>以最高的分数线被录取，但在毕业时却迎来了最差的行情</q>。</p>
+      <span class="where">第八、十章</span>
+    </div>
+  </div>
+</section>
+
+<section id="p4">
+  <div class="sec-head">
+    <p class="no">精讲之四 · 篇四（第十一至十三章）</p>
+    <h2>医疗体系：崩坏、寒冬与再生</h2>
+    <p>全书唯一的"系统修复"样本：控费如何压垮一个世界第一的医药帝国，改革又如何花二十年把它救回来。</p>
+  </div>
+  <div class="lec">
+    <div class="blk">
+      <h3>两个专有名词<small>第九、十一章</small></h3>
+      <p><b>医疗崩坏</b>：<q>1992年至2002年，是日本医疗史上的黑色10年</q>——经济衰退后的医保紧缩，叠加老龄化后的病患暴涨，医疗事故与医患矛盾层出不穷，医生大规模离职。<b>医药寒冬</b>：80 年代<q>日本医药产业一度俯视全球，每年新药产出占全世界的29%，是当时仅次于美国的第二大医药帝国</q>，但<q>这个帝国竟在短短10年间便轰然倒塌</q>——起因是医保巨额赤字下的药品大控费。</p>
+      <span class="where">第九、十一章</span>
+    </div>
+    <div class="blk">
+      <h3>再生的路径<small>第十二、十三章</small></h3>
+      <p>2004 年 OECD 报告点破病灶：<q>日本的医疗体系不是由竞争决定的，而是由一系列政府标准所决定的，严重阻碍了医药市场的公平竞争</q>。此后的医药复兴改革与医疗再生改革走了二十年：药价定期下调倒逼创新药出海、放宽仿制药替代、重构分级诊疗。对读者的含义很直接——控费不可怕，可怕的是只有控费没有改革；日本用二十年证明衰退的系统能修回来，但修复期恰好又是一代人。</p>
+      <span class="where">第十一至十三章</span>
+    </div>
+  </div>
+</section>
+
+<section id="p5">
+  <div class="sec-head">
+    <p class="no">精讲之五 · 篇五（第十四、十五章）</p>
+    <h2>全民出海："海外再造日本"，与中国的机遇期</h2>
+    <p>全书给出的出路：内需熄火的三十年里，日本普通人的最大增量在海外——而作者判断，同样的信号 2024 年已在中国出现。</p>
+  </div>
+  <div class="lec">
+    <div class="blk">
+      <h3>日本的出海十年<small>第十四章</small></h3>
+      <p><q>1994年至2004年是日本产业出海黄金期</q>——制造业产能转移同时吃下海外廉价劳动力与消费市场；2005 年非制造业出海投资比重首次超过制造业，黄金期结束。结论：<q>制造业出海的黄金时期一共只有宝贵的10年</q>，且出海终将催生本土替代（"海信、海尔打败日本企业"）。赢家往往不是大企业：大企业占出海主体比重从 90 年代的 73% 降到 2020 年的 23%，<q>如今的中小企业占据了日本海外市场的约7成以上</q>——跟着供应链本土化走的人吃到了红利。</p>
+      <span class="where">第十四章；数据源：《日本海外事业活动基本调查》</span>
+    </div>
+    <div class="blk">
+      <h3>中国出海元年：一个可核对的信号<small>第十五章</small></h3>
+      <div class="bigq"><q>2024年上半年，我国上市公司海外收入在去年两位数增长的基础上再创13%的10年峰值，但国内收入却出现10年来首次负增长。</q>——境内外收入增速差 14%，与日本 1993 年全面出海潮启动前的信号（增速差 15%）几乎重合。作者据此断言：<q>2024年就是真正意义上的中国出海元年</q>。
+        <span class="where">第十五章——这是全书与当下中国对接的枢纽句</span>
+      </div>
+      <p>岗位侧的印证：新能源车海外岗位增长率 412%（增长最快）；95 后出海意向超 75%、投递量为全年龄段均值 4 倍；文化出海阶段文科反转——2005 年后日本公立大学文科生就业率反超理科生，动漫产业做到 GDP 的 10%。</p>
+      <span class="where">第十五章；数据源：美世、猎聘、怡安翰威特等机构报告</span>
+    </div>
+  </div>
+</section>
+
+<section id="tl">
+  <div class="sec-head">
+    <p class="no">时间线</p>
+    <h2>日本 1989–2024：一条因果链</h2>
+    <p>琥珀色年份是书中标注的关键转折点。</p>
+  </div>
+  <div class="tl">
+    <div class="trow"><div class="y">1991</div><p>地产泡沫破裂。《研究院倍增计划》启动硕博大扩招；"科学立国"战略推进。</p></div>
+    <div class="trow"><div class="y hot">1993</div><p>厚生省报告宣告岗位需求持续锐减，"就业冰河期"开始；同年日本上市企业本土收入负增长、境内外收入增速差达 15%——出海潮启动前夜。</p></div>
+    <div class="trow"><div class="y">1995</div><p>公务员报考 65 万人（泡沫期两倍多）；教育学院就业率仅 50%；乡村分流与扩招已延缓约 90 万人就业。</p></div>
+    <div class="trow"><div class="y">1996</div><p>大基建停止，乡村岗位消亡，毕业生回流东京；博士扩招启动；私立硕士就业率跌破 60%。</p></div>
+    <div class="trow"><div class="y hot">1997–99</div><p>亚洲金融危机连击，GDP 两度负增长；国立科研机构法人化、降本增效，研究生就业率首破 70%。</p></div>
+    <div class="trow"><div class="y">1998</div><p>政府性质固定资产占 GDP 6.2%，为欧美同期的 3.1 倍——保就业的财政代价可见一斑。</p></div>
+    <div class="trow"><div class="y">2001–02</div><p>小泉政府"没有禁区的"大学结构改革；科研经费收缩，《研究院倍增计划》落幕。</p></div>
+    <div class="trow"><div class="y hot">2003</div><p>大学生就业率跌至 55% 谷底；博士入学 1.8 万人历史最高、就业率 54.4% 历史最低。</p></div>
+    <div class="trow"><div class="y">2005</div><p>非制造业出海投资首超制造业——产业出海黄金十年（1994–2004）结束；文化出海浪潮形成，文科就业率开始反超。</p></div>
+    <div class="trow"><div class="y">2007</div><p>校招恢复，大学生就业率回到 70%，但对冰河期世代已无意义。</p></div>
+    <div class="trow"><div class="y">2018</div><p>文部省首次承认科研衰退，对"研究院倍增计划"作出官方反思。</p></div>
+    <div class="trow"><div class="y hot">2024</div><p>冰河世代平均年龄超 50 岁；日本再提博士人数 20 年翻倍；同年作者判定中国境内外收入增速差 14% 触发同一信号——"中国出海元年"。</p></div>
+  </div>
+</section>
+
+<section id="method">
+  <div class="sec-head">
+    <p class="no">方法与可信度</p>
+    <h2>这是一本什么性质的书</h2>
+  </div>
+  <div class="method">
+    <div class="mrow"><p class="t">体裁：分析师的复盘叙事</p><p>不是学术专著，而是一份以《衰退时代生存指南》为目标的复盘手记：结构是"决策—代价—修复—出路"，每章都以"对今天的我们有什么借鉴"收口。与《置身事内》的学术讲义互补——一个给机制，一个给体感。</p></div>
+    <div class="mrow"><p class="t">数据纪律</p><p>书末附<q>数据引用说明</q>与<q>参考文献</q>两节，正文数据多锚定官方统计：文部科学省《学校基本调查》、厚生劳动省、总务省 e-Stat、《日本海外事业活动基本调查》、OECD 2004 年报告。中国部分（第十五章）则引用上市公司财报与美世、猎聘等机构数据——两类数据口径不同，引用时需注意。</p></div>
+  </div>
+  <div class="method" style="margin-top:20px">
+    <div class="mrow"><p class="t">适用与边界</p><p>最扎实的部分是日本段的官方数据链条；判断性内容（如"出海黄金十年只有一次""2024 年是中国出海元年"）属于作者的分析框架，属于可推断而非可查证，本页已按此区分标注。</p></div>
+    <div class="mrow"><p class="t">与系列页的关系</p><p>本页是《置身事内》图谱的姊妹篇；两书如何对读（六个交锋 + 双轨时间线）见对比阅读页；日本经验的"中国当下版"政策对照见农业改革政策备忘录。</p></div>
+  </div>
+</section>
+
+<section id="series">
+  <div class="sec-head">
+    <p class="no">阅读图谱系列</p>
+    <h2>三页连读路径</h2>
+  </div>
+  <div class="series">
+    <a class="slink" href="index.html"><p class="st">之一 · 图谱</p><h3 class="cn">置身事内 · 阅读图谱</h3><p>增长机器怎么转：土地、财政、债务、产业政策。</p></a>
+    <a class="slink" href="compare.html"><p class="st">对照 · 交锋</p><h3 class="jp">置身事内 × 以日为鉴 · 对比阅读</h3><p>六个交锋、双轨时间线、三组合读路径。</p></a>
+    <a class="slink" href="policy.html"><p class="st">延伸 · 当下</p><h3 class="ag">农业改革 · 政策备忘录</h3><p>已落地六件事与将实施排期（2024–2030）。</p></a>
+  </div>
+  <p class="veri">校验说明：本页所有引号内文字均逐字取自《以日为鉴》EPUB 全文（已解析为 src/jp_extract/jp_full.txt），经程序比对无改写；带"数据源"标注处注明了书中给出的统计出处。作者的分析性判断（出海元年、黄金十年等）与官方统计数据已分别表述。</p>
+</section>
+
+<footer>
+  <div class="wrap">
+    系列页：<a href="index.html">置身事内 · 阅读图谱</a> · <a href="compare.html">两书对比阅读</a> · <a href="policy.html">农业改革政策备忘录</a>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

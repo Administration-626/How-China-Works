@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>置身事内 · 阅读图谱</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23a8442a'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%23fff' font-family='serif'%3E置%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f7f5f1; --panel:#fffefb; --ink:#1f1c18; --ink2:#4a433b; --ink3:#8a8076;
+  --line:#e2dcd2; --line2:#d0c7b8; --accent:#a8442a; --accent2:#c4842f;
+  --blue:#2f5d8a; --green:#3f6b4f; --shadow:0 1px 2px rgba(60,45,30,.05),0 8px 24px rgba(60,45,30,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Songti SC","SimSun","Noto Serif CJK SC",Georgia,serif;
+  font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.sans{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+
+/* ---------- HERO ---------- */
+.hero{padding:70px 0 46px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-90px;top:-70px;width:340px;height:340px;
+  background:radial-gradient(circle,rgba(168,68,42,.09),transparent 68%);border-radius:50%}
+.hero .kicker{font-size:12.5px;letter-spacing:.22em;color:var(--accent);margin:0 0 20px;font-weight:600}
+.hero h1{font-size:clamp(34px,5.4vw,58px);line-height:1.14;margin:0 0 8px;letter-spacing:-.02em;font-weight:800}
+.hero .sub{font-size:clamp(15px,1.9vw,20px);color:var(--ink2);margin:0 0 26px;font-weight:400}
+.hero .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;padding-top:18px;border-top:1px dashed var(--line2)}
+.hero .meta b{color:var(--ink2);font-weight:600}
+.thesis{margin:30px 0 0;padding:22px 26px;background:var(--panel);border-left:3px solid var(--accent);
+  border-radius:0 12px 12px 0;box-shadow:var(--shadow);font-size:16px;line-height:1.9;color:var(--ink2)}
+.thesis em{font-style:normal;color:var(--accent);font-weight:700}
+
+/* ---------- NAV ---------- */
+/* ---------- 顶部导航 ---------- */
+#pbar{position:fixed;left:0;top:0;height:2px;width:0;background:var(--accent);z-index:60;
+  transition:width .12s linear;pointer-events:none}
+nav{position:sticky;top:0;z-index:40;background:rgba(247,245,241,.93);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);max-width:100%}
+/* 未粘顶时（滚动位置在 nav 之上）去掉背景与描边，避免在 hero 区
+   形成一条无意义的浅色横带，也与右侧浮点目录互相干扰 */
+nav:not(.stuck){background:transparent;backdrop-filter:none;border-bottom-color:transparent}
+nav .wrap{display:flex;align-items:center;gap:10px;padding-top:9px;padding-bottom:9px;
+  width:100%;min-width:0;max-width:1180px;margin:0 auto;padding-left:28px;padding-right:28px}
+nav .burger{display:none;flex:none;width:36px;height:36px;border:1px solid var(--line2);
+  background:var(--panel);border-radius:9px;cursor:pointer;padding:0;
+  flex-direction:column;align-items:center;justify-content:center;gap:4px}
+nav .burger i{display:block;width:16px;height:1.6px;background:var(--ink2);border-radius:2px;
+  transition:.22s}
+nav .burger:hover{border-color:var(--accent)}
+nav .burger.on i:nth-child(1){transform:translateY(5.6px) rotate(45deg)}
+nav .burger.on i:nth-child(2){opacity:0}
+nav .burger.on i:nth-child(3){transform:translateY(-5.6px) rotate(-45deg)}
+/* 顶部标签条：四组全部内联平铺，不随滚动换组。
+   实测四组总宽约 1950px（原书精读 682 + 书成之后 223 + 决策溯源 241 +
+   判断与现状 633 + 组名与分隔），1440px 视口装不下，
+   靠 overflow-x:auto 横向滚动，两端渐隐提示还有内容，
+   右侧「全部章节」下拉兼作不滚动就能看全的目录。
+   溢出时标签条会把当前项自动滚进视野（见滚动高亮逻辑）。 */
+nav .glab{font-size:11px;color:var(--ink3);letter-spacing:.06em;margin-right:5px;flex:none;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;white-space:nowrap}
+nav .strip{display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;
+  flex:1 1 auto;min-width:0;
+  /* 当前项居中时位移较大，加平滑过渡才自然。
+     程序化赋值 scrollLeft 在 smooth 下是异步的，所以断言里读值前要等动画结束。 */
+  scroll-behavior:smooth;
+  --fade:34px}
+nav .strip::-webkit-scrollbar{display:none}
+/* 两端渐隐：只在对应侧真的还有内容时才出现，提示可横向滚动 */
+nav .strip.ovR:not(.ovL){
+  -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - var(--fade)),transparent);
+  mask-image:linear-gradient(90deg,#000 calc(100% - var(--fade)),transparent)}
+nav .strip.ovL:not(.ovR){
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 var(--fade));
+  mask-image:linear-gradient(90deg,transparent,#000 var(--fade))}
+nav .strip.ovL.ovR{
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 var(--fade),
+    #000 calc(100% - var(--fade)),transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 var(--fade),
+    #000 calc(100% - var(--fade)),transparent)}
+/* 组与组之间用一条竖线分隔。
+   线本身是 flex 项，参与排布，不会随横向滚动错位。 */
+nav .sgrp{display:flex;align-items:center;gap:3px;flex:none}
+nav .sgrp+.sgrp::before{content:"";width:1px;height:20px;background:var(--line2);margin:0 9px;
+  flex:none}
+nav a{font-size:13.5px;color:var(--ink2);text-decoration:none;padding:7px 12px;border-radius:8px;
+  white-space:nowrap;font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:.16s;
+  position:relative;flex:none}
+nav a:hover{background:#ece7de;color:var(--accent)}
+nav a.on{background:var(--accent);color:#fff}
+nav .more{flex:none;position:relative}
+nav .more>button{font:inherit;font-size:13.5px;color:var(--ink2);background:none;border:none;
+  padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:.16s}
+nav .more>button:hover{background:#ece7de;color:var(--accent)}
+nav .more>button b{font-weight:400;margin-left:5px;font-size:9px;color:var(--ink3);
+  display:inline-block;transition:.2s}
+nav .more.on>button{background:#ece7de;color:var(--accent)}
+nav .more.on>button b{transform:rotate(180deg)}
+nav .pop{position:absolute;right:0;top:calc(100% + 9px);width:296px;max-height:min(70vh,620px);
+  overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:8px;
+  box-shadow:0 14px 38px rgba(60,45,30,.15);display:none;overscroll-behavior:contain}
+nav .pop::before{content:"";position:absolute;right:26px;top:-5px;width:9px;height:9px;
+  background:var(--panel);border-left:1px solid var(--line);border-top:1px solid var(--line);
+  transform:rotate(45deg)}
+nav .more.on .pop{display:block;animation:popin .16s ease-out}
+@keyframes popin{from{opacity:0;transform:translateY(-5px)}}
+nav .pop .ph{font-size:10.5px;color:var(--ink3);letter-spacing:.08em;padding:9px 10px 5px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+nav .pop .ph:not(:first-child){border-top:1px solid var(--line);margin-top:6px}
+nav .pop a{display:block;padding:7px 10px;border-radius:7px;font-size:13px}
+nav .pop a b{font-weight:400;color:var(--ink3);font-size:11px;margin-right:8px;
+  font-variant-numeric:tabular-nums}
+nav .pop a.on b{color:rgba(255,255,255,.7)}
+
+/* 移动端抽屉 */
+#mnav{position:fixed;inset:0;z-index:55;display:none}
+#mnav.on{display:block}
+#mnav .bd{position:absolute;inset:0;background:rgba(31,28,24,.42);backdrop-filter:blur(3px);
+  opacity:0;transition:.24s}
+#mnav .pn{position:absolute;left:0;top:0;bottom:0;width:88%;max-width:360px;background:var(--panel);
+  box-shadow:8px 0 34px rgba(60,45,30,.16);transform:translateX(-100%);transition:.26s cubic-bezier(.22,.75,.3,1);
+  display:flex;flex-direction:column}
+#mnav.on .bd{opacity:1}
+#mnav.on .pn{transform:none}
+#mnav .mh{flex:none;display:flex;align-items:center;justify-content:space-between;
+  padding:15px 18px;border-bottom:1px solid var(--line)}
+#mnav .mh span{font-size:14px;font-weight:700;color:var(--ink)}
+#mnav .mh button{width:30px;height:30px;border:1px solid var(--line2);background:var(--panel);
+  border-radius:7px;cursor:pointer;font-size:15px;color:var(--ink2);line-height:1;padding:0}
+#mnav .mb{flex:1;overflow-y:auto;padding:10px 12px 30px;overscroll-behavior:contain}
+#mnav .mh2{font-size:10.5px;color:var(--ink3);letter-spacing:.08em;padding:14px 8px 6px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+#mnav .mb a{display:block;padding:10px 11px;border-radius:9px;font-size:14px;color:var(--ink2);
+  text-decoration:none;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+#mnav .mb a b{font-weight:400;color:var(--ink3);font-size:11.5px;margin-right:10px;
+  font-variant-numeric:tabular-nums}
+#mnav .mb a.on{background:var(--accent);color:#fff}
+#mnav .mb a.on b{color:rgba(255,255,255,.72)}
+
+/* 右侧浮动目录。
+   z-index 高于 nav(40)：导航条是 sticky，静止位在 hero 之后（视口中线附近），
+   滚到页面顶部时正好横穿浮点目录区域。
+   配合 nav:not(.stuck) 的透明处理，两者视觉上不再互相干扰。 */
+#rdot{position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:45;
+  display:flex;flex-direction:column;gap:0;animation:fdin .5s .6s both}
+@keyframes fdin{from{opacity:0;transform:translateY(-50%) translateX(8px)}to{opacity:1;transform:translateY(-50%)}}
+#rdot a{display:flex;align-items:center;justify-content:flex-end;height:19px;gap:9px;
+  text-decoration:none}
+#rdot a i{display:block;width:12px;height:2px;border-radius:2px;background:var(--line2);
+  transition:width .2s, background .2s;flex:none}
+#rdot a s{font-size:11.5px;color:var(--ink3);text-decoration:none;white-space:nowrap;
+  font-style:normal;font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+  max-width:0;overflow:hidden;opacity:0;transition:max-width .22s ease,opacity .18s}
+/* 只展开「当前所在」与「被悬停」两项，避免全部展开时行高挤压重叠 */
+#rdot a.on s,#rdot a:hover s{max-width:200px;opacity:1;font-weight:700}
+#rdot a.on s{color:var(--accent)}
+#rdot a:hover s{color:var(--ink2)}
+#rdot a.on i,#rdot a:hover i{background:var(--accent);width:22px}
+/* 分组：每组首项上方留白 13px，首点略长，便于识别分段 */
+#rdot a.grpstart{margin-top:13px}
+#rdot a.grpstart:first-child{margin-top:0}
+#rdot a.grpstart i{width:17px;background:#cfc4b4}
+#rdot a.grpstart.on i,#rdot a.grpstart:hover i{width:25px;background:var(--accent)}
+@media(max-width:1180px){#rdot{display:none}}
+/* 窄屏：标签条放不下整条 18 项，改为只留汉堡按钮 + 「全部章节」。
+   断点取 760px：再窄下去横向滚动区太短（只能看到两三项），
+   不如直接用抽屉一次看全 18 项。标签条 display:none 后，
+   「全部章节」不再被 flex:1 的标签条挤到右侧，自然靠左跟在汉堡按钮后面。 */
+@media(max-width:760px){
+  nav .burger{display:flex}
+  nav .strip{display:none}
+}
+nav .wrap::-webkit-scrollbar{display:none}
+
+/* ---------- SECTION ---------- */
+section{padding:56px 0 8px;scroll-margin-top:64px}
+.sec-head{margin-bottom:28px}
+.sec-head h2{font-size:clamp(22px,3vw,30px);margin:0 0 10px;letter-spacing:-.015em;display:flex;
+  align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec-head h2 .num{font-size:13px;color:var(--accent);font-weight:700;letter-spacing:.1em;
+  border:1px solid currentColor;border-radius:5px;padding:2px 8px;transform:translateY(-3px)}
+.sec-head p{margin:0;color:var(--ink3);font-size:14px;max-width:720px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* ---------- 主线机制图 ---------- */
+.loop{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px 26px 24px;box-shadow:var(--shadow)}
+.loop svg{width:100%;height:auto;display:block}
+.loop-note{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:22px}
+.loop-note div{font-size:13.5px;color:var(--ink2);line-height:1.7;padding-left:14px;border-left:2px solid var(--accent2);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.loop-note div b{color:var(--ink);display:block;margin-bottom:3px;font-size:14px}
+
+/* ---------- 三原则 ---------- */
+.prin{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px 22px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.pcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.pcard:nth-child(2)::before{background:var(--accent2)}
+.pcard:nth-child(3)::before{background:var(--blue)}
+.pcard h3{margin:0 0 6px;font-size:17px}
+.pcard .tag{font-size:11.5px;color:var(--ink3);letter-spacing:.06em;margin-bottom:12px;display:block;
+  font-family:"PingFang SC",sans-serif}
+.pcard p{margin:0 0 12px;font-size:14px;color:var(--ink2);line-height:1.8}
+.pcard ul{margin:0;padding-left:17px;font-size:13.5px;color:var(--ink2);line-height:1.75}
+.pcard li{margin-bottom:5px}
+.pcard li b{color:var(--ink)}
+.pcard .eg{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line2);font-size:13px;color:var(--ink3)}
+
+/* ---------- 数量级榜 ---------- */
+.rank{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:8px 24px 20px;box-shadow:var(--shadow)}
+.rank-row{display:grid;grid-template-columns:1fr 200px 92px;gap:14px;align-items:center;
+  padding:11px 0;border-bottom:1px solid var(--line)}
+.rank-row:last-child{border-bottom:0}
+.rank-row .rlab{font-size:13.8px;color:var(--ink2);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.rank-row .rlab i{font-style:normal;color:var(--ink3);font-size:12px;margin-left:6px}
+.rank-bar{position:relative;z-index:1;height:11px;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.rank-bar.b2{background:linear-gradient(90deg,var(--blue),#5b8fc0)}
+.rank-bar.b3{background:linear-gradient(90deg,var(--green),#6d9b7c)}
+.rank-row .vv{text-align:right;font-size:14px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.rank-row .vv.g{color:var(--green)}
+.rank-row .vv.b{color:var(--blue)}
+
+/* ---------- 反直觉 ---------- */
+.myths{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.myth{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+.myth .q{font-size:14.5px;color:var(--ink2);margin:0 0 12px;line-height:1.7}
+.myth .q::before{content:"直觉";display:inline-block;font-size:10px;letter-spacing:.04em;
+  background:#eae4d9;color:var(--ink3);border-radius:4px;padding:2px 6px;margin-right:8px;
+  vertical-align:2px;font-family:"PingFang SC",sans-serif}
+.myth .a{font-size:14.5px;color:var(--ink);margin:0;line-height:1.78}
+.myth .a::before{content:"实际";display:inline-block;font-size:10px;letter-spacing:.04em;
+  background:var(--accent);color:#fff;border-radius:4px;padding:2px 6px;margin-right:8px;
+  vertical-align:2px;font-family:"PingFang SC",sans-serif}
+
+/* ---------- 图表墙 ---------- */
+.figwall{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;align-items:start}
+.fig{background:var(--panel);border:1px solid var(--line);border-radius:13px;overflow:hidden;cursor:zoom-in;
+  transition:.18s;box-shadow:var(--shadow)}
+.fig:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:0 4px 8px rgba(60,45,30,.06),0 14px 30px rgba(60,45,30,.1)}
+.fig .im{background:#fdfcfa;padding:14px;display:flex;align-items:center;justify-content:center;
+  min-height:190px;border-bottom:1px solid var(--line)}
+.fig .im img{max-width:100%;max-height:290px;width:100%;height:auto;object-fit:contain;display:block}
+.fig figcaption{padding:12px 14px 13px}
+.fig figcaption b{display:block;font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:4px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.5}
+.fig figcaption span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  max-height:4.5em;font-size:12.5px;color:var(--ink3);line-height:1.5;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.fig .badge{position:absolute;top:8px;right:10px;font-size:10.5px;background:rgba(247,245,241,.94);
+  border:1px solid var(--line);color:var(--accent);border-radius:5px;padding:2px 7px;font-weight:700;
+  font-family:"PingFang SC",sans-serif;z-index:2;letter-spacing:.02em}
+.fig{position:relative}
+
+/* ---------- 章节网格 ---------- */
+.tools{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12.8px;padding:6px 13px;border:1px solid var(--line2);background:var(--panel);border-radius:20px;
+  cursor:pointer;color:var(--ink2);transition:.15s;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.search{flex:1;min-width:190px;position:relative}
+.search input{width:100%;padding:9px 13px 9px 34px;border:1px solid var(--line2);border-radius:9px;
+  background:var(--panel);font-size:13.5px;color:var(--ink);outline:none;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.search input:focus{border-color:var(--accent)}
+.search::before{content:"⌕";position:absolute;left:12px;top:6px;font-size:16px;color:var(--ink3)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));gap:16px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:19px 20px;cursor:pointer;
+  transition:.18s;box-shadow:var(--shadow)}
+.card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 4px 8px rgba(60,45,30,.06),0 14px 30px rgba(60,45,30,.11)}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card .cid{font-size:11.5px;color:var(--accent);font-weight:700;letter-spacing:.07em;margin-bottom:7px;display:block}
+.card h3{margin:0 0 9px;font-size:15.5px;line-height:1.42;text-wrap:balance}
+.card p{margin:0;font-size:13px;color:var(--ink3);line-height:1.68;text-wrap:pretty}
+.card .ft{margin-top:13px;padding-top:11px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--ink3);
+  display:flex;gap:14px;font-family:"PingFang SC",sans-serif}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink3);font-size:14px}
+
+/* ---------- DRAWER ---------- */
+.scrim{position:fixed;inset:0;background:rgba(40,32,24,.34);opacity:0;visibility:hidden;z-index:60;
+  transition:opacity .24s,visibility 0s linear .28s;backdrop-filter:blur(2px)}
+.scrim.on{opacity:1;visibility:visible;transition-delay:0s}
+.drawer{position:fixed;top:24px;bottom:24px;left:0;right:0;width:min(880px,92vw);margin:0 auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;z-index:61;
+  display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(50,35,20,.26);
+  opacity:0;visibility:hidden;transform:translateY(12px);
+  transition:opacity .2s,transform .32s cubic-bezier(.2,.9,.3,1),visibility 0s linear .34s}
+.drawer.on{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+.drawer .dh{padding:20px 24px 15px;border-bottom:1px solid var(--line);flex-shrink:0;position:relative;background:var(--panel)}
+.drawer .dh .cid{font-size:11.5px;color:var(--accent);font-weight:700;letter-spacing:.08em;margin-bottom:6px}
+/* 标题右侧要给翻页/关闭按钮让位。按钮区宽度 = 3*36 + 2*6 = 120，右移 16，
+   所以 padding-right 取 16+120+10(间隙) = 146，避免长标题压在按钮下面 */
+.drawer .dh h3{margin:0;font-size:20px;line-height:1.36;padding-right:146px;text-wrap:balance}
+.drawer .dh .nav{position:absolute;right:16px;top:18px;display:flex;gap:6px}
+.drawer .dh .nav button{width:36px;height:36px;border:1px solid var(--line2);background:var(--panel);border-radius:7px;
+  cursor:pointer;color:var(--ink2);font-size:15px;line-height:1;transition:.15s;
+  display:flex;align-items:center;justify-content:center;padding:0}
+.drawer .dh .nav button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+/* 触屏或窄屏：按钮加大到 44px（Apple HIG 最小触控目标）并拉开间距防误点，
+   同时把标题从「右侧留白避让」改成「独占一行用满宽度」。
+   原因：393px 屏幕上标题若仍留 178px 给按钮，只剩 167px 可写，
+   长标题会被压成两行且断在词中间（「前言 从了 / 解现状开始」），很难读。
+   改为 flex-wrap：第一行「编号 + 按钮」两端对齐，第二行标题占满整宽。 */
+@media (max-width:760px), (hover:none) and (pointer:coarse){
+  .drawer .dh{display:flex;flex-wrap:wrap;align-items:center;padding:13px 20px 14px}
+  .drawer .dh .cid{order:1;flex:1 1 auto;margin-bottom:0;padding-right:10px}
+  .drawer .dh .nav{order:2;flex:none;position:static;right:auto;top:auto;gap:8px}
+  .drawer .dh .nav button{width:44px;height:44px;font-size:17px;border-radius:9px}
+  .drawer .dh h3{order:3;flex:1 1 100%;padding-right:0;margin-top:9px;font-size:19px}
+  /* 筛选胶囊也一样：原来 31px 高，手指容易点偏 */
+  .chip{padding:9px 15px;font-size:13.2px}
+}
+.drawer .db{overflow-y:auto;padding:22px 26px 40px;flex:1;scroll-behavior:smooth}
+.drawer .db p{margin:0 0 15px;font-size:14.8px;line-height:1.92;color:var(--ink2);text-align:justify}
+.drawer .db p.lead{color:var(--ink);font-weight:600;font-size:15.2px}
+.drawer .db figure{margin:22px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fdfcfa}
+.drawer .db figure img{width:100%;display:block;cursor:zoom-in;background:#fff}
+.drawer .db figcaption{padding:12px 15px;font-size:12.8px;color:var(--ink2);background:var(--panel);
+  border-top:1px solid var(--line);font-family:"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.66}
+.drawer .db figcaption b{color:var(--ink);display:block;margin-bottom:3px}
+.drawer .db figcaption i{font-style:normal;color:var(--ink3);font-size:12px}
+.kv{margin:20px 0;padding:16px 18px;background:#f5f1e9;border-radius:11px;border:1px solid var(--line)}
+.kv b{font-size:13px;color:var(--accent);display:block;margin-bottom:9px;letter-spacing:.04em;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.kv ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink2);line-height:1.8}
+.kv li{margin-bottom:4px}
+.kv li em{font-style:normal;font-weight:700;color:var(--accent)}
+
+/* ---------- LIGHTBOX ---------- */
+.lb{position:fixed;inset:0;background:rgba(28,22,16,.9);z-index:90;display:flex;align-items:center;
+  justify-content:center;padding:34px;opacity:0;visibility:hidden;transition:.22s;cursor:zoom-out}
+.lb.on{opacity:1;visibility:visible}
+.lb img{max-width:100%;max-height:100%;border-radius:10px;background:#fff}
+.lb .cap{position:absolute;bottom:22px;left:0;right:0;text-align:center;color:#e8e2d8;font-size:13.5px;
+  font-family:"PingFang SC",sans-serif;padding:0 30px}
+
+/* ---------- 时间轴 ---------- */
+.tl{position:relative;padding-left:34px}
+.tl::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:var(--line2)}
+.tl .it{position:relative;margin-bottom:26px}
+.tl .it::before{content:"";position:absolute;left:-30px;top:7px;width:11px;height:11px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--bg);box-shadow:0 0 0 2px var(--accent)}
+.tl .yr{font-size:12.5px;color:var(--accent);font-weight:700;letter-spacing:.06em;margin-bottom:4px;
+  font-family:"PingFang SC",sans-serif}
+.tl h4{margin:0 0 5px;font-size:15.5px}
+.tl p{margin:0;font-size:13.6px;color:var(--ink2);line-height:1.75;max-width:660px}
+
+/* ---------- 金句 ---------- */
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.qt{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:22px 24px;box-shadow:var(--shadow);position:relative}
+.qt::before{content:"”";position:absolute;right:18px;top:2px;font-size:52px;color:var(--line2);font-family:Georgia,serif;line-height:1}
+.qt p{margin:0 0 12px;font-size:15px;line-height:1.85;color:var(--ink);font-weight:500}
+.qt cite{font-style:normal;font-size:12.5px;color:var(--ink3);font-family:"PingFang SC",sans-serif}
+
+/* ---------- 疫情掩护论 / 时序对照 ---------- */
+.cover{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 24px 22px;box-shadow:var(--shadow)}
+.cover svg{width:100%;height:auto;display:block}
+.cover-note{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:22px}
+.cover-note div{font-size:13.5px;color:var(--ink2);line-height:1.72;padding-left:14px;border-left:2px solid var(--blue);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.cover-note div b{color:var(--ink);display:block;margin-bottom:3px;font-size:14px}
+
+/* ---------- 对照表 ---------- */
+.cmp{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+.cmp-row{display:grid;grid-template-columns:132px 1fr 1fr;border-bottom:1px solid var(--line)}
+.cmp-row:last-child{border-bottom:0}
+.cmp-row>div{padding:13px 16px;font-size:13.6px;line-height:1.72;color:var(--ink2);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;border-right:1px solid var(--line)}
+.cmp-row>div:last-child{border-right:0}
+.cmp-h{background:#f4f0e8}
+.cmp-h>div{font-weight:700;color:var(--ink);font-size:13.2px;letter-spacing:.03em}
+.cmp-row .ct{background:#faf8f4;font-weight:600;color:var(--ink);font-size:13.2px}
+.cmp-row .hd{font-weight:700;color:var(--accent)}
+.cmp-row .num{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+.cmp-tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:4px;margin-right:6px;
+  vertical-align:2px;font-family:"PingFang SC",sans-serif;letter-spacing:.03em}
+.cmp-tag.book{background:#eae4d9;color:var(--ink3)}
+.cmp-tag.now{background:var(--accent);color:#fff}
+.cmp-tag.guess{background:#f0e6cc;color:#8a6a1f}
+
+/* ---------- 预测核对 ---------- */
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.vd{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+.vd .claim{font-size:14.6px;color:var(--ink);margin:0 0 12px;line-height:1.75;font-weight:600}
+.vd .claim::before{content:"书中判断";display:inline-block;font-size:10px;letter-spacing:.04em;
+  background:#eae4d9;color:var(--ink3);border-radius:4px;padding:2px 6px;margin-right:8px;
+  vertical-align:2px;font-family:"PingFang SC",sans-serif}
+.vd .fact{font-size:14px;color:var(--ink2);margin:0;line-height:1.78}
+.vd .fact::before{content:"2026 实况";display:inline-block;font-size:10px;letter-spacing:.04em;
+  background:var(--green);color:#fff;border-radius:4px;padding:2px 6px;margin-right:8px;
+  vertical-align:2px;font-family:"PingFang SC",sans-serif}
+.vd .mark{margin-top:13px;padding-top:11px;border-top:1px dashed var(--line);font-size:12.8px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7}
+.vd .mark b{color:var(--accent)}
+
+/* ---------- 数据表 ---------- */
+.dtab{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+.dtab-cap{padding:14px 18px;font-size:13px;font-weight:700;color:var(--ink);background:#f4f0e8;
+  border-bottom:1px solid var(--line);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.dtab-cap span{font-weight:400;color:var(--ink3);font-size:12px;margin-left:8px}
+.drow{display:grid;grid-template-columns:1fr 190px 92px;gap:12px;align-items:center;padding:11px 18px;
+  border-bottom:1px solid var(--line)}
+.drow:last-child{border-bottom:0}
+.drow .dl{font-size:13.6px;color:var(--ink2);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.drow .dl i{font-style:normal;color:var(--ink3);font-size:12px;margin-left:6px}
+.dbar{height:11px;border-radius:6px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.dbar.g{background:linear-gradient(90deg,var(--green),#6d9b7c)}
+.dbar.b{background:linear-gradient(90deg,var(--blue),#5b8fc0)}
+.drow .dv{text-align:right;font-size:14px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.drow .dv.r{color:var(--accent)}
+.drow .dv.g{color:var(--green)}
+.dtab-fn{padding:12px 18px;font-size:12px;color:var(--ink3);line-height:1.75;background:#faf8f4;
+  border-top:1px solid var(--line);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* ---------- 时点声明 ---------- */
+.asof{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 16px;background:#f2f6fa;
+  border:1px solid #d6e2ee;border-radius:11px;font-size:12.8px;color:#3f5c78;margin-bottom:22px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7}
+.asof b{color:#2f5d8a}
+
+/* ---------- 为什么 / 政策动因 ---------- */
+.why{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.wcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.wcard::before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--accent)}
+.wcard.lv2::before{background:var(--accent2)}
+.wcard.lv3::before{background:var(--blue)}
+.wcard.lv4::before{background:var(--green)}
+.wcard .tagline{font-size:11px;letter-spacing:.1em;color:var(--ink3);margin-bottom:9px;display:block;
+  font-family:"PingFang SC",sans-serif;font-weight:600}
+.wcard h4{margin:0 0 11px;font-size:16px;line-height:1.5}
+.wcard p{margin:0 0 11px;font-size:13.8px;color:var(--ink2);line-height:1.8}
+.wcard .ev{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line2);font-size:12.6px;color:var(--ink3);
+  line-height:1.7;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.wcard .ev b{color:var(--ink2)}
+.wcard .ev code{font-family:Consolas,Monaco,monospace;font-size:12px;background:#f2ede4;padding:1px 5px;
+  border-radius:4px;color:var(--accent)}
+
+/* ---------- 观点 / 学者表态 ---------- */
+.views{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.vcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column}
+.vcard .who{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+.vcard .who b{font-size:15.5px;color:var(--ink)}
+.vcard .who span{font-size:11.8px;color:var(--ink3);font-family:"PingFang SC",sans-serif}
+.vcard .stance{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:4px;letter-spacing:.03em;
+  font-family:"PingFang SC",sans-serif;font-weight:700}
+.vcard .stance.neg{background:#fbeceb;color:#a8442a}
+.vcard .stance.pos{background:#eaf3ec;color:#3f6b4f}
+.vcard .stance.mid{background:#f2f6fa;color:#2f5d8a}
+.vcard q{display:block;font-size:14.2px;line-height:1.85;color:var(--ink);margin:0 0 12px;
+  padding-left:15px;border-left:2px solid var(--line2);font-style:normal}
+.vcard q::before,.vcard q::after{content:""}
+.vcard .src{margin-top:auto;padding-top:11px;border-top:1px dashed var(--line);font-size:11.8px;
+  color:var(--ink3);font-family:"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.65}
+.vcard .cmt{font-size:12.8px;color:var(--ink2);margin:0 0 10px;line-height:1.75;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.vcard .cmt b{color:var(--accent)}
+
+/* ---------- 时间锚点对照 ---------- */
+.anchor{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+.arow{display:grid;grid-template-columns:150px 1fr 128px;border-bottom:1px solid var(--line)}
+.arow:last-child{border-bottom:0}
+.arow>div{padding:13px 16px;font-size:13.5px;line-height:1.72;color:var(--ink2);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;border-right:1px solid var(--line)}
+.arow>div:last-child{border-right:0;text-align:center}
+.arow .ak{background:#faf8f4;font-weight:700;color:var(--ink);font-size:13px;font-variant-numeric:tabular-nums}
+.arow.hd{background:#f4f0e8}
+.arow.hd>div{font-weight:700;color:var(--ink);font-size:13px}
+.arow .rk{font-weight:700;font-size:12.5px}
+.arow .rk.y{color:var(--accent)}
+.arow .rk.n{color:var(--ink3)}
+.arow .rk.p{color:#8a6a1f}
+
+/* ---------- 账目核算 ---------- */
+.ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr));gap:16px}
+.lg{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden}
+.lg::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green)}
+.lg.no::before{background:var(--accent)}
+.lg.half::before{background:var(--accent2)}
+.lg .verdict{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;padding:3px 9px;
+  border-radius:5px;margin-bottom:11px;font-family:"PingFang SC",sans-serif}
+.lg .verdict.y{background:#eaf3ec;color:#3f6b4f}
+.lg .verdict.n{background:#fbeceb;color:#a8442a}
+.lg .verdict.h{background:#fdf3e4;color:#8a6a1f}
+.lg .verdict.o{background:#eceef2;color:#4a5568}
+.lg h4{margin:0 0 9px;font-size:15.5px;line-height:1.5}
+.lg p{margin:0 0 10px;font-size:13.6px;color:var(--ink2);line-height:1.78}
+.lg p b{color:var(--ink)}
+.lg .ev{margin-top:11px;padding-top:10px;border-top:1px dashed var(--line2);font-size:12.4px;color:var(--ink3);
+  line-height:1.7;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.lg.open::before{background:#9aa4b2}
+
+/* ---------- 当年 vs 现在 ---------- */
+.track{display:grid;grid-template-columns:1fr;gap:14px}
+.trk{display:grid;grid-template-columns:150px 1fr 200px;gap:0;background:var(--panel);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+@media(max-width:860px){
+  .trk{grid-template-columns:1fr}
+  .trk .who{border-right:none;border-bottom:1px solid var(--line)}
+  .trk .mid{border-right:none;border-bottom:1px solid var(--line)}
+}
+.trk .who{padding:18px;border-right:1px solid var(--line);background:#faf8f4}
+.trk .who .n{font-weight:700;font-size:14.5px;color:var(--ink);display:block;margin-bottom:3px}
+.trk .who .r{font-size:11.5px;color:var(--ink3);line-height:1.5;display:block}
+.trk .mid{padding:16px 20px;border-right:1px solid var(--line)}
+.trk .pair{margin-bottom:12px}
+.trk .pair:last-child{margin-bottom:0}
+.trk .pair .tag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:4px;
+  margin-right:7px;vertical-align:1px}
+.trk .pair .tag.a{background:#eef0f3;color:#5a6472}
+.trk .pair .tag.b{background:#eef4ef;color:#3f6b4f}
+.trk .pair p{margin:5px 0 0;font-size:13.2px;color:var(--ink2);line-height:1.75}
+.trk .pair p b{color:var(--ink)}
+.trk .side{padding:18px;display:flex;flex-direction:column;justify-content:center;gap:8px;background:#faf8f4}
+.trk .side .dtag{font-size:12px;font-weight:700;padding:4px 9px;border-radius:6px;text-align:center}
+.trk .side .dtag.shift{background:#fbeceb;color:#a8442a}
+.trk .side .dtag.taken{background:#eef4ef;color:#3f6b4f}
+.trk .side .dtag.ok{background:#eef4ef;color:#3f6b4f}
+.trk .side .dtag.keep{background:#eef0f3;color:#5a6472}
+.trk .side .dtag.over{background:#f2f0ec;color:#6b6357}
+.trk .side .note{font-size:12px;color:var(--ink3);line-height:1.65}
+
+/* ---------- 未知清单 ----------
+   下限 430px 而非 320px：本项目两处都放 4 张卡片，
+   320px 在 1082px 内容宽下会排成 3+1（最后一行空掉 2/3），
+   430px 稳定 2 列 → 2×2 排满。 */
+.unknown{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr));gap:15px}
+.uk{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
+.uk h4{margin:0 0 4px;font-size:15px}
+.uk .vb{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;
+  background:#eceef2;color:#4a5568;margin-bottom:10px}
+.uk p{margin:0 0 9px;font-size:13.4px;color:var(--ink2);line-height:1.78}
+.uk p b{color:var(--ink)}
+.uk p:last-child{margin-bottom:0}
+
+/* ---------- 化债的账谁在付（三分：已知 / 可推断 / 不可知） ---------- */
+.wp{display:grid;gap:16px}
+.wp-g{border:1px solid var(--line);border-radius:14px;background:var(--panel);
+  box-shadow:var(--shadow);overflow:hidden}
+.wp-hd{display:flex;align-items:center;gap:10px;padding:13px 20px;
+  border-bottom:1px solid var(--line);background:#faf8f4;flex-wrap:wrap}
+.wp-hd h3{margin:0;font-size:15.5px}
+.wp-lv{font-size:11px;font-weight:700;padding:2px 9px;border-radius:5px;flex:none;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.wp-lv.known{background:#e6efe7;color:#3d6a4d}
+.wp-lv.infer{background:#f2ecdd;color:#7a6535}
+.wp-lv.unknown{background:#eceef2;color:#4a5568}
+.wp-hd em{font-style:normal;font-size:12.4px;color:var(--ink3);margin-left:auto}
+.wp-bd{padding:6px 20px 14px}
+/* 已知：方案表 */
+.wp-row{display:grid;grid-template-columns:190px 1fr auto;gap:14px;align-items:baseline;
+  padding:11px 0;border-bottom:1px dashed var(--line2);font-size:13.4px}
+.wp-row:last-child{border-bottom:0}
+.wp-row .k{font-weight:700;color:var(--ink)}
+.wp-row .n{color:var(--ink3);font-size:12.6px;line-height:1.6}
+.wp-row .v{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;
+  white-space:nowrap;font-size:13.2px}
+/* 可推断：四个口袋 */
+.wp-pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr));gap:14px}
+.pk{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:16px 18px;
+  box-shadow:var(--shadow)}
+.pk h4{margin:0 0 9px;font-size:14.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pk h4 span{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:4px;
+  background:#f2ecdd;color:#7a6535;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.pk p{margin:0 0 9px;font-size:13.2px;color:var(--ink2);line-height:1.76}
+.pk p:last-child{margin-bottom:0}
+.pk p i{font-style:normal;display:inline-block;font-size:11.4px;font-weight:700;
+  color:#7a6535;background:#f6f2e6;border-radius:4px;padding:1px 6px;margin-right:6px}
+.pk p.lim{color:var(--ink3);font-size:12.6px;border-top:1px dashed var(--line2);padding-top:9px}
+.pk p b{color:var(--ink)}
+/* 口袋卡片数为奇数时，最后一张（中央财政那条）跨列，避免末行只占半宽 */
+.pk.wide{grid-column:1/-1}
+/* 可观测：数字表 */
+/* 操作时间线：第一行「时间 + 操作 + 证据等级」，说明占整行 */
+.op{display:grid;grid-template-columns:minmax(96px,auto) 1fr auto;gap:10px;
+  align-items:baseline;padding:12px 0;border-bottom:1px dashed var(--line2)}
+.op:last-child{border-bottom:0}
+.op .d{font-size:12.4px;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.op .t{font-size:13.6px;font-weight:700;color:var(--ink)}
+.op .lv2{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.op .lv2.fact{background:#e6efe7;color:#3d6a4d}
+.op .lv2.infer{background:#f2ecdd;color:#7a6535}
+.op p{grid-column:1/-1;margin:7px 0 0;font-size:12.9px;color:var(--ink2);line-height:1.76}
+.op p b{color:var(--ink)}
+/* 当日各方动作：主体名可能较长，首列给下限 */
+.op.jul{grid-template-columns:minmax(112px,auto) 1fr}
+.op.jul .who{font-size:13.2px;font-weight:700;color:var(--ink)}
+.op.jul .act{font-size:13.2px;color:var(--accent);font-weight:700}
+
+/* 8 条数据。不要用 255px 走 4 列：263px 的格子装不下最长的
+   「近 400 家 · 拟减持超 1200 亿」，数值会被压成竖排单字。
+   430px 下限 → 2 列 4 行，横向空间充裕。 */
+.wp-num{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(430px,100%),1fr));gap:10px}
+.nm{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  border:1px solid var(--line);border-radius:11px;padding:12px 15px;background:var(--panel)}
+.nm .l{font-size:13.2px;color:var(--ink2);line-height:1.5}
+.nm .l i{display:block;font-style:normal;font-size:11.4px;color:var(--ink3);margin-top:2px}
+.nm .v{font-size:14.5px;font-weight:700;color:var(--accent);white-space:nowrap;
+  font-variant-numeric:tabular-nums}
+.wp-fn{margin-top:14px;font-size:12.4px;color:var(--ink3);line-height:1.7}
+.wp-sub{margin:20px 0 4px;font-size:13.5px;font-weight:700;color:var(--ink);
+  padding-top:16px;border-top:1px solid var(--line)}
+.wp-note{margin-top:18px;background:#faf8f4;border:1px solid var(--line);
+  border-left:3px solid #9aa4b2;border-radius:10px;padding:14px 18px;
+  font-size:12.9px;color:var(--ink2);line-height:1.78}
+.wp-note b{color:var(--ink)}
+/* 方案表的首列固定 190px，在手机（315px 容器）里必然横向溢出
+   —— 实测 7 行全部 scrollWidth > clientWidth。窄屏改成堆叠三段式：
+   项目名一行，说明一行，数值一行。 */
+@media(max-width:700px){
+  .wp-row{grid-template-columns:1fr;gap:4px;padding:12px 0}
+  .wp-row .v{white-space:normal}
+  .wp-hd{padding:12px 16px}
+  .wp-bd{padding:4px 16px 12px}
+  /* 数值列不可压缩（nowrap），横排时会把标签挤成两行
+     —— 窄屏改竖排：标签一行占满，数值一行左对齐。 */
+  .nm{flex-direction:column;align-items:flex-start;gap:4px}
+}
+
+/* ---------- 边界提示 ---------- */
+.unote{margin-top:18px;background:#faf8f4;border:1px solid var(--line);border-left:3px solid #9aa4b2;
+  border-radius:10px;padding:16px 20px}
+.unote-h{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.unote-b{font-size:13.4px;color:var(--ink2);line-height:1.8}
+.unote-b b{color:var(--ink)}
+
+/* ---------- 类比对照 ---------- */
+.analogy{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);
+  border-radius:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+.an{padding:18px 20px;border-bottom:1px solid var(--line)}
+.an:nth-child(odd){border-right:1px solid var(--line)}
+.an:nth-last-child(-n+2){border-bottom:0}
+.an .k{font-size:12px;font-weight:700;letter-spacing:.05em;margin-bottom:9px;display:block;
+  font-family:"PingFang SC",sans-serif}
+.an.same .k{color:var(--green)}
+.an.diff .k{color:var(--accent)}
+.an p{margin:0 0 8px;font-size:13.5px;color:var(--ink2);line-height:1.76}
+.an p:last-child{margin-bottom:0}
+.an p b{color:var(--ink)}
+.an .lead{font-size:11.5px;color:var(--ink3);font-family:"PingFang SC",sans-serif;display:block;margin-bottom:4px}
+.an-tag{height:4px}
+@media (max-width:620px){
+  .analogy{grid-template-columns:1fr}
+  .an:nth-child(odd){border-right:0}
+  .an:nth-last-child(-n+2){border-bottom:1px solid var(--line)}
+  .an:last-child{border-bottom:0}
+}
+
+/* ---------- 风险路径 ---------- */
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.pth{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+.pth .hd{font-size:12px;letter-spacing:.06em;font-weight:700;color:var(--accent);margin-bottom:8px;
+  font-family:"PingFang SC",sans-serif}
+.pth h4{margin:0 0 10px;font-size:15.5px;line-height:1.5}
+.pth p{margin:0 0 11px;font-size:13.6px;color:var(--ink2);line-height:1.78}
+.pth .chain{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0;padding-top:11px;border-top:1px dashed var(--line2)}
+.pth .chain i{font-style:normal;font-size:11.8px;background:#f2ede4;color:var(--ink2);border-radius:5px;
+  padding:3px 8px;font-family:"PingFang SC",sans-serif}
+.pth .chain i::after{content:"›";margin-left:6px;color:var(--ink3)}
+.pth .chain i:last-child::after{content:""}
+
+footer{margin-top:70px;padding:34px 0 50px;border-top:1px solid var(--line);font-size:12.8px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.85}
+footer b{color:var(--ink2)}
+@media (max-width:620px){
+  .wrap{padding:0 18px}
+  nav .wrap{padding-left:18px;padding-right:18px}
+  .hero{padding:44px 0 32px}
+  .drawer{top:0;bottom:0;width:100%;border:0;border-radius:0}
+  .rank-row{grid-template-columns:1fr 92px}
+  .rank-row .rank-bar{display:none}
+  .cmp-row{grid-template-columns:1fr}
+  .cmp-row>div{border-right:0;border-bottom:1px solid var(--line)}
+  .cmp-row>div:last-child{border-bottom:0}
+  .cmp-h{display:none}
+  .cmp-row .ct{background:#f0ece3}
+  .drow{grid-template-columns:1fr 92px}
+  .drow .dbar{display:none}
+  .arow{grid-template-columns:1fr}
+  .arow>div{border-right:0;border-bottom:1px solid var(--line)}
+  .arow>div:last-child{border-bottom:0;text-align:left}
+  .arow.hd{display:none}
+  .arow .ak{background:#f0ece3}
+  section{padding:40px 0 6px}
+  .lb{padding:12px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">阅读图谱 · READING MAP</p>
+    <h1>置身事内</h1>
+    <p class="sub">中国政府与经济发展 · 兰小欢</p>
+    <div class="meta">
+      <span>上海人民出版社 · <b>2021</b></span>
+      <span>全书 <b>8 章</b> 分上下两篇</span>
+      <span>收录原书图表 <b>26 幅</b></span>
+      <span>本页 <b id="sz">—</b></span>
+    </div>
+    <div class="thesis">
+      全书只讲一件事：<em>在我国，政府不但影响“蛋糕”的分配，也参与“蛋糕”的生产</em>，所以不可能脱离政府谈经济。
+      上篇拆解微观机制（事权、财权、土地、投资、债务），下篇解释这些机制如何堆出宏观现象（房价、地区差距、债务风险、结构失衡、贸易冲突）。
+    </div>
+  </div>
+</header>
+
+<div id="pbar"></div>
+<nav><div class="wrap">
+  <button class="burger" id="burger" aria-label="章节列表" aria-expanded="false">
+    <i></i><i></i><i></i>
+  </button>
+  <div class="strip" id="nstrip"></div>
+  <div class="more" id="nmore">
+    <button aria-haspopup="true" aria-expanded="false">全部章节<b>&#9662;</b></button>
+    <div class="pop" id="npop"></div>
+  </div>
+</div></nav>
+
+<aside id="rdot" aria-label="章节快速跳转"></aside>
+
+<div id="mnav" role="dialog" aria-modal="true" aria-label="章节列表">
+  <div class="bd" id="mbd"></div>
+  <div class="pn">
+    <div class="mh"><span>章节列表</span><button id="mclose" aria-label="关闭">&times;</button></div>
+    <div class="mb" id="mb"></div>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ===== 主线机制 ===== -->
+<section id="loop">
+  <div class="sec-head">
+    <h2><span class="num">01</span>贯穿全书的那台机器</h2>
+    <p>作者反复强调：地方债务的根源不在“收入不够”，而在“支出太多”。下面这个闭环是全书 8 章的共同骨架，每一环都能对应到具体章节。</p>
+  </div>
+  <div class="loop">
+    <svg viewBox="0 0 1000 470" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,Microsoft YaHei,sans-serif">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 z" fill="#a8442a"/>
+        </marker>
+        <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 z" fill="#2f5d8a"/>
+        </marker>
+      </defs>
+
+      <!-- 1 -->
+      <rect x="34" y="42" width="196" height="86" rx="11" fill="#fdf6f2" stroke="#a8442a" stroke-width="1.6"/>
+      <text x="132" y="72" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">1994 分税制改革</text>
+      <text x="132" y="94" text-anchor="middle" font-size="11.6" fill="#8a8076">财权上收中央</text>
+      <text x="132" y="112" text-anchor="middle" font-size="11.6" fill="#8a8076">事权仍留地方</text>
+
+      <!-- 2 -->
+      <rect x="272" y="42" width="196" height="86" rx="11" fill="#fffefb" stroke="#d0c7b8" stroke-width="1.6"/>
+      <text x="370" y="72" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">财权事权错配</text>
+      <text x="370" y="94" text-anchor="middle" font-size="11.6" fill="#8a8076">发展经济任务不减</text>
+      <text x="370" y="112" text-anchor="middle" font-size="11.6" fill="#8a8076">可支配财力锐减</text>
+
+      <!-- 3 -->
+      <rect x="510" y="42" width="196" height="86" rx="11" fill="#fdf7ef" stroke="#c4842f" stroke-width="1.6"/>
+      <text x="608" y="72" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">土地财政</text>
+      <text x="608" y="94" text-anchor="middle" font-size="11.6" fill="#8a8076">卖地收入 + 相关税收</text>
+      <text x="608" y="112" text-anchor="middle" font-size="11.6" fill="#8a8076">（实质是房地产财政）</text>
+
+      <!-- 4 -->
+      <rect x="748" y="42" width="218" height="86" rx="11" fill="#fdf7ef" stroke="#c4842f" stroke-width="1.6"/>
+      <text x="857" y="72" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">土地金融</text>
+      <text x="857" y="94" text-anchor="middle" font-size="11.6" fill="#8a8076">以土地抵押撬动信贷</text>
+      <text x="857" y="112" text-anchor="middle" font-size="11.6" fill="#8a8076">城投公司 + 银行 + 城投债</text>
+
+      <line x1="232" y1="85" x2="266" y2="85" stroke="#a8442a" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="470" y1="85" x2="504" y2="85" stroke="#a8442a" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="708" y1="85" x2="742" y2="85" stroke="#c4842f" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <!-- 5 -->
+      <rect x="748" y="200" width="218" height="86" rx="11" fill="#fdf6f2" stroke="#a8442a" stroke-width="1.6"/>
+      <text x="857" y="230" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">大举基建 + 招商</text>
+      <text x="857" y="252" text-anchor="middle" font-size="11.6" fill="#8a8076">工业园区 / 地铁 / 新城</text>
+      <text x="857" y="270" text-anchor="middle" font-size="11.6" fill="#8a8076">京东方式产业投资</text>
+
+      <line x1="857" y1="130" x2="857" y2="194" stroke="#a8442a" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <!-- 6 -->
+      <rect x="510" y="200" width="196" height="86" rx="11" fill="#fffefb" stroke="#d0c7b8" stroke-width="1.6"/>
+      <text x="608" y="230" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">增长 → 地价上涨</text>
+      <text x="608" y="252" text-anchor="middle" font-size="11.6" fill="#8a8076">城市扩张，土地升值</text>
+      <text x="608" y="270" text-anchor="middle" font-size="11.6" fill="#8a8076">抵押物价值抬升</text>
+
+      <line x1="748" y1="243" x2="710" y2="243" stroke="#a8442a" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <!-- 回环 -->
+      <path d="M510,243 L470,243 L470,404 L857,404 L857,292" fill="none" stroke="#2f5d8a" stroke-width="1.6"
+            stroke-dasharray="6 5" marker-end="url(#ar2)"/>
+      <rect x="548" y="378" width="332" height="52" rx="9" fill="#f2f6fa" stroke="#2f5d8a" stroke-width="1.3"/>
+      <text x="714" y="399" text-anchor="middle" font-size="13" font-weight="700" fill="#2f5d8a">闭环：只要地价持续上涨，这套机器就能自我强化</text>
+      <text x="714" y="418" text-anchor="middle" font-size="11.6" fill="#5b7f9e">一旦地价停涨，抵押物缩水，债务链条立刻反向收紧</text>
+
+      <!-- 后果 -->
+      <rect x="34" y="180" width="434" height="240" rx="11" fill="#fffefb" stroke="#e2dcd2" stroke-width="1.4"/>
+      <text x="54" y="208" font-size="13" font-weight="700" fill="#8a8076">宏观后果（下篇 · 第五至七章）</text>
+      <line x1="54" y1="220" x2="448" y2="220" stroke="#e2dcd2"/>
+
+      <text x="54" y="248" font-size="13.2" fill="#4a433b">房价飞涨，居民债务占 GDP 升至   <tspan font-weight="700" fill="#a8442a">54%</tspan></text>
+      <text x="54" y="276" font-size="13.2" fill="#4a433b">宏观债务总量达 GDP 的   <tspan font-weight="700" fill="#a8442a">258%</tspan></text>
+      <text x="54" y="304" font-size="13.2" fill="#4a433b">居民最终消费占 GDP 仅   <tspan font-weight="700" fill="#a8442a">44%</tspan>（美国近 70%）</text>
+      <text x="54" y="332" font-size="13.2" fill="#4a433b">省界地区贫困发生率远高于非边界县</text>
+      <text x="54" y="360" font-size="13.2" fill="#4a433b">产能过剩向外输出，引发贸易冲突</text>
+      <text x="54" y="388" font-size="13.2" fill="#4a433b">重土地、轻人：土地城市化快于人的城市化</text>
+
+      <line x1="240" y1="404" x2="466" y2="243" stroke="#2f5d8a" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#ar2)" opacity=".75"/>
+    </svg>
+    <div class="loop-note">
+      <div><b>起点是制度约束</b>分税制解决了中央的财政困境（中央收入占比 22% → 55%），但也把地方推向了预算外收入。</div>
+      <div><b>关键是土地价格</b>作者点明：土地真正的力量不在“土地财政”，而在以土地为抵押撬动的银行信贷，加了杠杆就成了“土地金融”。</div>
+      <div><b>闭环必然反转</b>这套模式的死穴是单点依赖：地价必须持续上涨。一旦停涨，抵押物缩水、信贷收缩、债务风险暴露，就是第六章的主题。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 事权三原则 ===== -->
+<section id="prin">
+  <div class="sec-head">
+    <h2><span class="num">02</span>事权划分三原则</h2>
+    <p>第一章是全书唯一的方法论章节。作者用三条原则解释“为什么权力这样分”，后面所有章节都在这套框架里展开。</p>
+  </div>
+  <div class="prin">
+    <div class="pcard">
+      <h3>外部性与规模经济</h3>
+      <span class="tag">EXTERNALITY &amp; SCALE</span>
+      <p>一件事只影响本地，就本地全权处理；影响溢出到别处，上级就要介入。行政区域大小应与政策影响范围一致。</p>
+      <ul>
+        <li>市里建小学 → 市里决定</li>
+        <li>工厂污染邻市 → 省里协调</li>
+        <li>污染跨省 → 中央协调</li>
+        <li><b>规模经济</b>：覆盖人越多越划算，所以国防全归中央；教育受校舍限制，所以归地方</li>
+      </ul>
+      <div class="eg">反面案例：省界处“三不管地带”贫困率奇高，156 万平方公里国土上，贫困县过半在边界。</div>
+    </div>
+    <div class="pcard">
+      <h3>信息复杂性</h3>
+      <span class="tag">INFORMATION ASYMMETRY</span>
+      <p>上级有“形式权威”，下级靠信息优势握有“实际权威”。维护两者的平衡，是政府有效运作的关键。</p>
+      <ul>
+        <li>上级视察只能听汇报，内容是否可靠不受控</li>
+        <li>不想办就拖着、或频繁请示把风险踢给上级</li>
+        <li>古代“官”与“吏”：吏是车把式，官是骡子</li>
+        <li>英国常务次官（permanent secretary）同理</li>
+      </ul>
+      <div class="eg">作者的判词：所谓权力，实质就是在说不清楚的情况下由谁来拍板决策的问题。说不清的事多了，权力必向个人集中，这也是“一把手负责制”的根源。</div>
+    </div>
+    <div class="pcard">
+      <h3>激励相容</h3>
+      <span class="tag">INCENTIVE COMPATIBILITY</span>
+      <p>一方想做的事，另一方既有意愿也有能力做好。上下级之间要激励相容，工作目标与官员自身利益之间也要激励相容。</p>
+      <ul>
+        <li>专业性强、标准化高 → 倾向垂直管理（海关）</li>
+        <li>与地方经济密不可分 → 倾向地方管理（工商局 1999 收归省管，2011 回归地方）</li>
+        <li>GDP 目标层层加码：中央 7.5% → 省级均值 9.7% → 市级均值 10.6%</li>
+      </ul>
+      <div class="eg">“胡萝卜加大棒”：经济发展是地方官的主要政绩，直接关联升迁，这才是招商引资竞争的动力源。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 原书图表 ===== -->
+<section id="figs">
+  <div class="sec-head">
+    <h2><span class="num">03</span>原书图表 · 26 幅</h2>
+    <p>这本书的数据图本身就是论证主体，不是配图。点击任意一张放大查看原图与完整图注。图表按书中出现顺序排列。</p>
+  </div>
+  <div class="figwall" id="figwall"></div>
+</section>
+
+<!-- ===== 数量级榜 ===== -->
+<section id="rank">
+  <div class="sec-head">
+    <h2><span class="num">04</span>数量级榜</h2>
+    <p>作者反复强调“算账要算两边”。这些数字是全书论证的承重墙，条形长度按数值比例绘制。</p>
+  </div>
+  <div class="rank" id="rankwall"></div>
+</section>
+
+<!-- ===== 反直觉 ===== -->
+<section id="myth">
+  <div class="sec-head">
+    <h2><span class="num">05</span>直觉 vs 实算</h2>
+    <p>这本书最有教育价值的部分：作者反复用具体数据推翻流行的直觉判断。</p>
+  </div>
+  <div class="myths" id="mythwall"></div>
+</section>
+
+<!-- ===== 时间轴 ===== -->
+<section id="tl">
+  <div class="sec-head">
+    <h2><span class="num">06</span>改革时间轴</h2>
+    <p>全书主线可以用一条制度演进线串起来。每一环都是对上一环副作用的回应。</p>
+  </div>
+  <div class="tl" id="tlwall"></div>
+</section>
+
+<!-- ===== 章节索引 ===== -->
+<section id="chapters">
+  <div class="sec-head">
+    <h2><span class="num">07</span>章节索引 · 53 节</h2>
+    <p>点击卡片打开全文正文与相关图表。筛选按上篇 / 下篇分组，也可按关键词搜索。</p>
+  </div>
+  <div class="tools">
+    <div class="chips" id="chips"></div>
+    <div class="search"><input id="q" type="search" placeholder="搜索章节、关键词，如 土地财政 / 债务 / 光伏"></div>
+  </div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<!-- ===== 金句 ===== -->
+<section id="quote">
+  <div class="sec-head">
+    <h2><span class="num">08</span>金句</h2>
+    <p>原文摘录，未作改写。</p>
+  </div>
+  <div class="quotes" id="quotewall"></div>
+</section>
+
+<!-- ===== 书成之后 ===== -->
+<section id="after">
+  <div class="sec-head">
+    <h2><span class="num">09</span>书成之后 · 五年时序</h2>
+    <p>原书数据止于 2019 年，2021 年出版。这一节用作者的分析框架，去核对他没来得及写的那五年。</p>
+  </div>
+  <div class="asof">
+    <b>数据时点</b>第 09 至 18 节全部属于书外内容，截至 <b>2026 年 8 月末至 9 月初</b>；来源标注在每张表下。凡属推断而非可查数据的，均在正文中显式说明。
+  </div>
+  <div class="tl" id="afterwall"></div>
+</section>
+
+<!-- ===== 疫情掩护论 ===== -->
+<section id="cover">
+  <div class="sec-head">
+    <h2><span class="num">10</span>疫情掩护论 · 时序还原</h2>
+    <p>一个必须先纠正的事实：房地产转向的决策时点是 2020 年下半年，不是 2023 年。“长痛不如短痛”是评论者的概括，不是任何一份文件的原话，也不是决策起点。</p>
+  </div>
+  <div class="cover">
+    <svg viewBox="0 0 1000 430" xmlns="http://www.w3.org/2000/svg" font-family="PingFang SC,Microsoft YaHei,sans-serif">
+      <defs>
+        <marker id="cv_ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L7,3 L0,6 z" fill="#a8442a"/>
+        </marker>
+      </defs>
+
+      <!-- 疫情窗口底带 -->
+      <rect x="34" y="300" width="560" height="66" rx="10" fill="#f2f6fa" stroke="#2f5d8a" stroke-width="1.4" stroke-dasharray="7 5"/>
+      <text x="314" y="326" text-anchor="middle" font-size="13.5" font-weight="700" fill="#2f5d8a">疫情窗口：公众注意力被完全占据</text>
+      <text x="314" y="348" text-anchor="middle" font-size="11.8" fill="#5b7f9e">这是掩护，更是一个归因容器：任何经济数据的恶化都可以记在疫情账上</text>
+
+      <!-- 时间主轴 -->
+      <line x1="52" y1="262" x2="966" y2="262" stroke="#d0c7b8" stroke-width="2"/>
+      <line x1="52" y1="262" x2="600" y2="262" stroke="#2f5d8a" stroke-width="3"/>
+
+      <!-- 节点：2020.08 -->
+      <rect x="40" y="40" width="212" height="96" rx="11" fill="#fdf6f2" stroke="#a8442a" stroke-width="1.8"/>
+      <circle cx="146" cy="262" r="7" fill="#a8442a"/>
+      <line x1="146" y1="252" x2="146" y2="140" stroke="#a8442a" stroke-width="1.5"/>
+      <text x="146" y="66" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">2020.08 三道红线</text>
+      <text x="146" y="88" text-anchor="middle" font-size="11.6" fill="#8a8076">资产负债率 / 净负债率 / 现金短债比</text>
+      <text x="146" y="106" text-anchor="middle" font-size="11.6" fill="#8a8076">直接掐住房企有息负债增速</text>
+      <text x="146" y="124" text-anchor="middle" font-size="11.6" font-weight="700" fill="#a8442a">这是决策起点</text>
+
+      <!-- 节点：2020.12 -->
+      <rect x="272" y="40" width="212" height="96" rx="11" fill="#fdf6f2" stroke="#a8442a" stroke-width="1.8"/>
+      <circle cx="378" cy="262" r="7" fill="#a8442a"/>
+      <line x1="378" y1="252" x2="378" y2="140" stroke="#a8442a" stroke-width="1.5"/>
+      <text x="378" y="66" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">2020.12 贷款集中度</text>
+      <text x="378" y="88" text-anchor="middle" font-size="11.6" fill="#8a8076">银行房地产贷款余额占比设上限</text>
+      <text x="378" y="106" text-anchor="middle" font-size="11.6" fill="#8a8076">分五档管理，从资金供给端下手</text>
+      <text x="378" y="124" text-anchor="middle" font-size="11.6" font-weight="700" fill="#a8442a">比三道红线更狠</text>
+
+      <!-- 节点 2021 -->
+      <rect x="504" y="40" width="184" height="96" rx="11" fill="#fdf7ef" stroke="#c4842f" stroke-width="1.6"/>
+      <circle cx="596" cy="262" r="7" fill="#c4842f"/>
+      <line x1="596" y1="252" x2="596" y2="140" stroke="#c4842f" stroke-width="1.5"/>
+      <text x="596" y="66" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">2021 恒大暴雷</text>
+      <text x="596" y="88" text-anchor="middle" font-size="11.6" fill="#8a8076">多数人当作黑天鹅</text>
+      <text x="596" y="106" text-anchor="middle" font-size="11.6" fill="#8a8076">实为两道政策叠加后的必然</text>
+      <text x="596" y="124" text-anchor="middle" font-size="11.6" font-weight="700" fill="#a8442a">不是意外，是出清</text>
+
+      <!-- 节点 2022 -->
+      <rect x="712" y="40" width="184" height="96" rx="11" fill="#fffefb" stroke="#d0c7b8" stroke-width="1.6"/>
+      <circle cx="804" cy="262" r="7" fill="#8a8076"/>
+      <line x1="804" y1="252" x2="804" y2="140" stroke="#8a8076" stroke-width="1.5"/>
+      <text x="804" y="66" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1f1c18">2022 停贷潮</text>
+      <text x="804" y="88" text-anchor="middle" font-size="11.6" fill="#8a8076">烂尾楼风险外溢到居民端</text>
+      <text x="804" y="106" text-anchor="middle" font-size="11.6" fill="#8a8076">政策转向“保交楼”</text>
+      <text x="804" y="124" text-anchor="middle" font-size="11.6" font-weight="700" fill="#a8442a">代价显现的时点</text>
+
+      <!-- 节点 2023 -->
+      <rect x="828" y="336" width="150" height="80" rx="11" fill="#f4f0e8" stroke="#d0c7b8" stroke-width="1.6"/>
+      <circle cx="903" cy="262" r="7" fill="#8a8076"/>
+      <line x1="903" y1="272" x2="903" y2="336" stroke="#8a8076" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="903" y="360" text-anchor="middle" font-size="13.5" font-weight="700" fill="#4a433b">2023 公开定调</text>
+      <text x="903" y="380" text-anchor="middle" font-size="11.4" fill="#8a8076">“长痛不如短痛”</text>
+      <text x="903" y="398" text-anchor="middle" font-size="11.4" fill="#8a8076">是追认，不是决策</text>
+
+      <!-- 因果箭头 -->
+      <line x1="256" y1="88" x2="266" y2="88" stroke="#a8442a" stroke-width="1.6" marker-end="url(#cv_ar)"/>
+      <line x1="488" y1="88" x2="498" y2="88" stroke="#c4842f" stroke-width="1.6" marker-end="url(#cv_ar)"/>
+      <line x1="692" y1="88" x2="706" y2="88" stroke="#8a8076" stroke-width="1.6" marker-end="url(#cv_ar)"/>
+
+      <text x="52" y="286" font-size="11.6" fill="#8a8076">2020</text>
+      <text x="596" y="286" text-anchor="middle" font-size="11.6" fill="#8a8076">2021</text>
+      <text x="804" y="286" text-anchor="middle" font-size="11.6" fill="#8a8076">2022</text>
+      <text x="903" y="286" text-anchor="middle" font-size="11.6" fill="#8a8076">2023</text>
+    </svg>
+    <div class="cover-note">
+      <div><b>决策在前，感知在后</b>两道政策都是财务与监管指标，不是“加息”“限购”这类公众可直接感知的语言。影响要经过一到两年传导才落到房价上，公众感知严重滞后。</div>
+      <div><b>不需要公开定调也能执行</b>两条都是部门规章层面，靠银行与房企的合规压力推动，不依赖社会共识。这正是原书强调的特征：部门有能力先行动，事后追认。</div>
+      <div><b>归因容器效应</b>2020 到 2022 年，经济数据的恶化都可归因于疫情，无需追问结构性原因。2023 年容器消失，房地产收缩、地方财政压力、居民资产负债表受损同时暴露。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 为什么是 2020 ===== -->
+<section id="why">
+  <div class="sec-head">
+    <h2><span class="num">11</span>为什么是 2020 · 四层动因</h2>
+    <p>上一节只回答了"什么时候"，没回答"为什么"。政策动因没有单一标准答案，但四层解释各有可查的支撑，从上到下由近及远。</p>
+  </div>
+  <div class="why" id="whywall"></div>
+
+  <div style="height:22px"></div>
+
+  <div class="anchor" id="anchorwall">
+    <div class="arow hd">
+      <div>时间锚点</div><div>外部环境</div><div>政策取向</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 主流说法 ===== -->
+<section id="views">
+  <div class="sec-head">
+    <h2><span class="num">12</span>主流说法 · 谁在怎么说</h2>
+    <p>关于三道红线，公开表态的立场差别很大。按对政策本身的评价分成支持、反对、折中三类，各自附原话与出处。</p>
+  </div>
+  <div class="views" id="viewwall"></div>
+</section>
+
+<!-- ===== 李稻葵核算 ===== -->
+<section id="ledger">
+  <div class="sec-head">
+    <h2><span class="num">13</span>当年判断 · 后来怎么变</h2>
+    <p>上一节只记录他们当时怎么说。这一节分两层：先核对他 2020 年那三个判断被验证到什么程度，再看 2026 年的他改口了没有。分不清「没被执行」和「被证伪」，是最常见的推理错误。</p>
+  </div>
+  <div class="ledger" id="lgwall"></div>
+  <div class="unote">
+    <div class="unote-h">为什么不能直接用 2026 年的数据判他错</div>
+    <div class="unote-b">他主张的是增加住宅供给，而 2020 年之后政策走的是压需求、掐融资、控供地三条路，<b>这条方案从未进入过政策选项</b>；2026 年 7 月的供地规则更是反方向的。拿一个从未执行过的方案，去对比执行了另一套方案的结果，推不出「他的判断错了」。同理，<b>「首次购房占比下降」只说明结构变化，推不出「购房需求消失」</b>；拿全国平均去否定一个结构性问题，属于另一类逻辑跳跃。</div>
+  </div>
+</section>
+
+<!-- ===== 当年 vs 现在 ===== -->
+<section id="track">
+  <div class="sec-head">
+    <h2><span class="num">14</span>当年判断 vs 现在说法</h2>
+    <p>六七年过去了。把这些人当时的话和 2025 至 2026 年的最新表态摆在一起，看谁的立场变了、谁被采纳、谁还在坚持。</p>
+  </div>
+  <div class="track" id="trkwall"></div>
+</section>
+
+<!-- ===== 未知清单 ===== -->
+<section id="unknown">
+  <div class="sec-head">
+    <h2><span class="num">15</span>我们真正不知道什么</h2>
+    <p>把讨论收在能确认的边界上。下面四条是目前没有定论的问题，附上为什么没有定论。</p>
+  </div>
+  <div class="unknown" id="ukwall"></div>
+</section>
+
+<!-- ===== 判断核对 ===== -->
+<section id="verdict">
+  <div class="sec-head">
+    <h2><span class="num">16</span>书中判断 vs 2026 实况</h2>
+    <p>作者在 2019 年前后写下的判断，逐条拿 2026 年的数据核对。命中、偏离、失准分开标。</p>
+  </div>
+  <div class="verdicts" id="vdwall"></div>
+</section>
+
+<!-- ===== 2026 实况 ===== -->
+<section id="nowdata">
+  <div class="sec-head">
+    <h2><span class="num">17</span>2026 实况数据</h2>
+    <p>表格分三组：房地产、财政与债务、宏观与社会。条形长度按数值比例绘制，不跨表比较。</p>
+  </div>
+
+  <div class="cmp">
+    <div class="cmp-row cmp-h">
+      <div>对照项</div><div>原书（数据止于 2019）</div><div>2026 实况</div>
+    </div>
+    <div class="cmp-row">
+      <div class="ct">市场性质</div>
+      <div>增量开发为主，新房是市场主角</div>
+      <div class="hd">存量时代：2026 上半年二手房成交占比 50.4%，首次在全国与半年度尺度上过半</div>
+    </div>
+    <div class="cmp-row">
+      <div class="ct">价格</div>
+      <div>地价持续上涨是整套机器运转的前提</div>
+      <div class="hd">新房均价同比 +2.04%（供应结构推高），二手房价同比 −7.08%，累计 −3.76%</div>
+    </div>
+    <div class="cmp-row">
+      <div class="ct">地方土地收入</div>
+      <div>国有土地转让收入每年 5 至 6 万亿</div>
+      <div>房地产市场收缩直接压制土地出让收入，是本轮地方财政压力的主要来源</div>
+    </div>
+    <div class="cmp-row">
+      <div class="ct">地方债务</div>
+      <div>2018 年末宏观债务总量达 GDP 的 258%</div>
+      <div class="hd">隐债从 2023 年末 14.3 万亿降至 2026 年 4 月末约 5 万亿；城投有息债务仍有约 39 万亿</div>
+    </div>
+    <div class="cmp-row">
+      <div class="ct">居民消费</div>
+      <div>居民最终消费占 GDP 仅 44%，美国近 70%</div>
+      <div class="hd">仍未修复：2026 上半年社零同比 +1.3%，居民平均消费倾向约 64.56%，同比略降</div>
+    </div>
+    <div class="cmp-row">
+      <div class="ct">政策定位</div>
+      <div>改革之道在于从生产投资型政府转向服务型政府</div>
+      <div class="hd">2026 年 7 月政治局会议“稳定房地产市场”从“防风险”挪到“筑牢安全屏障”框架下</div>
+    </div>
+  </div>
+
+  <div style="height:22px"></div>
+
+  <div class="dtab" id="dt_estate"></div>
+  <div style="height:18px"></div>
+  <div class="dtab" id="dt_fiscal"></div>
+  <div style="height:18px"></div>
+  <div class="dtab" id="dt_macro"></div>
+
+  <div style="height:22px"></div>
+
+  <div class="dtab" id="dt_debt">
+    <div class="dtab-cap">化债进度条<span>按金额占比绘制，非时间进度</span></div>
+    <div id="debtbody"></div>
+    <div class="dtab-fn">来源：财政部公开数据、Wind、2024 年 11 月全国人大常委会批准的化债方案。6 万亿置换债安排在 2024 至 2026 年每年发行 2 万亿。</div>
+  </div>
+</section>
+
+<!-- ===== 化债的账谁在付 ===== -->
+<section id="whopays">
+  <div class="sec-head">
+    <h2><span class="num">18</span>化债的账谁在付</h2>
+    <p>化债的资金安排是公开的，代价的分配不是。本节把能查到的、只能推断的、以及外部无法证实或证伪的严格分开写。国家队 2026 年的操作记录也放在这里，因为它是「股市这一格」里规模最大、也最可追踪的一笔钱。</p>
+  </div>
+
+  <div class="wp">
+
+    <div class="wp-g">
+      <div class="wp-hd">
+        <h3>方案与进度</h3><span class="wp-lv known">已知</span>
+        <em>有文件、有口径、有数</em>
+      </div>
+      <div class="wp-bd" id="wp_plan"></div>
+    </div>
+
+    <div class="wp-g">
+      <div class="wp-hd">
+        <h3>代价落在谁身上</h3><span class="wp-lv infer">可推断</span>
+        <em>机制清楚，量化缺失</em>
+      </div>
+      <div class="wp-bd">
+        <div class="wp-pk" id="wp_pocket"></div>
+      </div>
+    </div>
+
+    <div class="wp-g">
+      <div class="wp-hd">
+        <h3>股市这一格：能观测到的数字</h3><span class="wp-lv known">可观测</span>
+        <em>现象是事实，归因才是判断</em>
+      </div>
+      <div class="wp-bd">
+        <div class="wp-num" id="wp_stock"></div>
+        <div class="wp-fn">来源：Wind、交易所公开数据、上市公司减持公告、媒体统计；印花税为财政部月度/年度财政收支数据（2026-01-30、2026-07-22、2026-08-21 发布），社保数据为全国社会保障基金 2025 年度报告（2026-09-01 披露）。两个防误读点：一、证券交易印花税 2023 年 8 月起已减半征收，近年高增长完全由成交额放量驱动，与税率无关；二、即便翻倍，印花税全年规模占全国税收也只约 1.5%，「麻」的是增速，不是量级。减持与亏损比例为多方统计，口径存在差异。「指数上涨而个股下跌」是这一轮的显著特征，本身不构成对动机的判断。</div>
+      </div>
+    </div>
+
+    <div class="wp-g">
+      <div class="wp-hd">
+        <h3>国家队 2026 年的操作</h3><span class="wp-lv known">可观测</span>
+        <em>份额是硬数据，归因是测算</em>
+      </div>
+      <div class="wp-bd">
+        <div id="wp_ops"></div>
+        <div class="wp-sub">2026 年 7 月 17 日：同一天的六方动作</div>
+        <div id="wp_july"></div>
+        <div class="wp-note" id="wp_profit"></div>
+      </div>
+    </div>
+
+    <div class="wp-g">
+      <div class="wp-hd">
+        <h3>外部看不到的部分</h3><span class="wp-lv unknown">不可知</span>
+        <em>不是信息不够，是结构上不可见</em>
+      </div>
+      <div class="wp-bd">
+        <div class="unknown" id="wp_unknown"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== AI 是新型地产吗 ===== -->
+<section id="ai">
+  <div class="sec-head">
+    <h2><span class="num">19</span>AI 是新型房地产吗</h2>
+    <p>一个流传很广的类比：AI 有很长的上下游产业链，有大量资金涌入，所以它就是新型房地产。这个类比在结构上部分成立，在关键处不成立。分开说。</p>
+  </div>
+
+  <div class="analogy" id="anwall"></div>
+
+  <div style="height:26px"></div>
+
+  <div class="sec-head" style="margin-bottom:18px">
+    <h2 style="font-size:19px">两条断裂路径</h2>
+    <p>如果 AI 投资回报不达预期，链条怎么断。和房地产的断法不同，但同样依赖一个不能中断的预期。</p>
+  </div>
+  <div class="paths" id="pathwall"></div>
+
+  <div style="height:22px"></div>
+
+  <div class="dtab" id="dt_verdict">
+    <div class="dtab-cap">结论分界<span>按可证实程度分层</span></div>
+    <div id="vdbody"></div>
+    <div class="dtab-fn">本节的判断区分三类：可查数据、结构性推断、需要继续观察的早期信号。不做确定性断言。</div>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  <p><b>关于本页</b>　第 01 至 08 节内容摘自兰小欢《置身事内：中国政府与经济发展》（上海人民出版社，2021），26 幅图表为 EPUB 原书插图，本页已压缩内嵌。第 09 至 19 节为书外内容，基于截至 2026 年 9 月的公开数据整理，来源在各节标注；其中第 18 节严格区分可查数据、可推断与不可知三类，不做动机断言。</p>
+  <p><b>阅读建议</b>　想抓主干，按“主线机制 → 事权三原则 → 数量级榜”顺序读；想核对数据，直接跳到图表墙；想看这本书写完之后的走向，从第 09 节“书成之后”往下读。<b>本页单文件自包含，可离线打开、可直接分享。</b></p>
+  <p><b>边界声明</b>　书外部分严格区分可查数据、推断与价值判断。凡属推断的结论均已在正文中显式标明，不做确定性断言。</p>
+</div></footer>
+
+<!-- DRAWER -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dtitle">
+  <div class="dh">
+    <div class="cid" id="dcid"></div>
+    <h3 id="dtitle"></h3>
+    <div class="nav">
+      <button id="dprev" title="上一节（←）" aria-label="上一节">←</button>
+      <button id="dnext" title="下一节（→）" aria-label="下一节">→</button>
+      <button id="dclose" title="关闭（Esc）" aria-label="关闭">✕</button>
+    </div>
+  </div>
+  <div class="db" id="dbody"></div>
+</aside>
+
+<div class="lb" id="lb"><img id="lbimg" alt=""><div class="cap" id="lbcap"></div></div>
+
+<script type="application/json" id="DATA">/*__DATA__*/</script>
+<script>
+(function(){
+'use strict';
+const D = JSON.parse(document.getElementById('DATA').textContent);
+const CH = D.chapters, FIG = D.figs, ORDER = D.order;
+const byId = Object.fromEntries(CH.map(c=>[c.id,c]));
+
+/* ---------- 章节摘要（人工撰写，基于原文） ---------- */
+const SUMMARY = /*__SUMMARY__*/;
+
+/* ---------- 数量级榜数据（全部来自原书） ---------- */
+const RANKS = /*__RANKS__*/;
+
+/* ---------- 反直觉 ---------- */
+const MYTHS = /*__MYTHS__*/;
+
+/* ---------- 时间轴 ---------- */
+const TL = /*__TL__*/;
+
+/* ---------- 金句 ---------- */
+const QUOTES = /*__QUOTES__*/;
+
+/* ---------- 书成之后（时序） ---------- */
+const AFTER = /*__AFTER__*/;
+
+/* ---------- 为什么（四层动因） ---------- */
+const WHY = /*__WHY__*/;
+
+/* ---------- 主流说法 ---------- */
+const VIEWS = /*__VIEWS__*/;
+
+/* ---------- 时间锚点 ---------- */
+const ANCHOR = /*__ANCHOR__*/;
+
+/* ---------- 李稻葵判断核算 ---------- */
+const LEDGER = /*__LEDGER__*/;
+const TRACK = /*__TRACK__*/;
+const UNKNOWN = /*__UNKNOWN__*/;
+
+/* ---------- AI 类比 ---------- */
+const ANALOGY = /*__ANALOGY__*/;
+const PATHS = /*__PATHS__*/;
+const AIVERDICT = /*__AIVERDICT__*/;
+
+/* ---------- 判断核对 ---------- */
+const VERDICTS = /*__VERDICTS__*/;
+
+/* ---------- 2026 实况数据表 ---------- */
+const TABLES = /*__TABLES__*/;
+
+/* ---------- 化债进度 ---------- */
+const DEBT = /*__DEBT__*/;
+
+/* ---------- 化债的账谁在付（三分） ---------- */
+const WPLAN = /*__WPLAN__*/;
+const WPLAN_FN = /*__WPLAN_FN__*/;
+const WPOCKET = /*__WPOCKET__*/;
+const WSTOCK = /*__WSTOCK__*/;
+const WUNKNOWN = /*__WUNKNOWN__*/;
+const WTOPS = /*__WTOPS__*/;
+const WJULY = /*__WJULY__*/;
+const WPROFIT = /*__WPROFIT__*/;
+const WPROFIT_TAIL = /*__WPROFIT_TAIL__*/;
+
+/* ================= 渲染 ================= */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+/* ================= 导航 ================= */
+const NAVG = [
+  {k:'read', n:'原书精读', items:[
+    ['loop','主线机制','01'],['prin','事权三原则','02'],['figs','原书图表','03'],
+    ['rank','数量级榜','04'],['myth','反直觉','05'],['tl','改革时间轴','06'],
+    ['chapters','章节索引','07'],['quote','金句','08']]},
+  {k:'after', n:'书写完之后', items:[
+    ['after','书成之后','09'],['cover','疫情掩护论','10']]},
+  {k:'why', n:'决策溯源', items:[
+    ['why','为什么是2020','11'],['views','主流说法','12']]},
+  {k:'verdict', n:'判断与现状', items:[
+    ['ledger','判断与追踪','13'],['track','当年 vs 现在','14'],['unknown','未知清单','15'],
+    ['verdict','判断核对','16'],['nowdata','2026 实况','17'],['whopays','化债谁在付','18'],
+    ['ai','AI 是新型地产吗','19']]},
+];
+const NAV_FLAT = NAVG.reduce((a,g)=>a.concat(g.items.map(it=>({id:it[0],t:it[1],num:it[2],grp:g.k}))),[]);
+
+/* 顶部标签条：四组全部内联。
+   之前只放第一组（原书精读），导致「书成之后」起 10 个区块在标签条上
+   完全没有可见入口，只能从「全部章节」下拉里找。
+   实测四组总宽约 1950px，超宽时横向滚动，两端用渐隐遮罩提示还有内容。 */
+(function(){
+  const strip = document.getElementById('nstrip'), more = document.getElementById('nmore'),
+        pop = document.getElementById('npop');
+  strip.innerHTML = NAVG.map(g=>
+    '<div class="sgrp"><span class="glab">'+esc(g.n)+'</span>' +
+    g.items.map(it=>'<a href="#'+it[0]+'" data-nav="'+it[0]+'">'+esc(it[1])+'</a>').join('')+
+    '</div>'
+  ).join('');
+  // 下拉放全部四组，兼作完整目录
+  pop.innerHTML = NAVG.map(g=>
+    '<div class="ph">'+esc(g.n)+'</div>' +
+    g.items.map(it=>'<a href="#'+it[0]+'" data-nav="'+it[0]+'">'+
+      '<b>'+esc(it[2])+'</b>'+esc(it[1])+'</a>').join('')
+  ).join('');
+  // 两端渐隐：只在真的溢出时才显示，滚到端点时对应侧消失
+  function edges(){
+    const max = strip.scrollWidth - strip.clientWidth;
+    strip.classList.toggle('ovL', max > 2 && strip.scrollLeft > 2);
+    strip.classList.toggle('ovR', max > 2 && strip.scrollLeft < max - 2);
+  }
+  strip.addEventListener('scroll', edges, {passive:true});
+  addEventListener('resize', edges);
+  const btn = more.querySelector('button');
+  btn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const on = !more.classList.contains('on');
+    more.classList.toggle('on', on); btn.setAttribute('aria-expanded', on?'true':'false');
+  });
+  document.addEventListener('click', ()=>{ more.classList.remove('on'); btn.setAttribute('aria-expanded','false'); });
+  pop.addEventListener('click', ()=>{ more.classList.remove('on'); btn.setAttribute('aria-expanded','false'); });
+  setTimeout(edges, 80);
+  window.__navEdges = edges;
+})();
+
+/* 移动端抽屉 */
+(function(){
+  const m = document.getElementById('mnav'), bg = document.getElementById('burger'),
+        bd = document.getElementById('mbd'), mb = document.getElementById('mb'),
+        cl = document.getElementById('mclose');
+  mb.innerHTML = NAVG.map(g=>
+    '<div class="mh2">'+esc(g.n)+'</div>' +
+    g.items.map(it=>'<a href="#'+it[0]+'" data-nav="'+it[0]+'">'+
+      '<b>'+esc(it[2])+'</b>'+esc(it[1])+'</a>').join('')
+  ).join('');
+  function open(o){
+    m.classList.toggle('on', o); bg.classList.toggle('on', o);
+    bg.setAttribute('aria-expanded', o?'true':'false');
+    document.body.style.overflow = o ? 'hidden' : '';
+  }
+  bg.addEventListener('click', ()=>open(!m.classList.contains('on')));
+  cl.addEventListener('click', ()=>open(false));
+  bd.addEventListener('click', ()=>open(false));
+  mb.addEventListener('click', e=>{ if(e.target.closest('a')) open(false); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && m.classList.contains('on')) open(false); });
+})();
+
+/* 右侧浮动目录 */
+(function(){
+  const host = document.getElementById('rdot');
+  host.innerHTML = NAV_FLAT.map((n,i)=>
+    '<a href="#'+n.id+'" data-nav="'+n.id+'"'+
+    (i===0 || NAV_FLAT[i-1].grp!==n.grp ? ' class="grpstart"' : '')+'>'+
+    '<s>'+esc(n.t)+'</s><i></i></a>').join('');
+})();
+
+/* 滚动高亮 + 阅读进度（单一 rAF 循环） */
+(function(){
+  const links = [...document.querySelectorAll('[data-nav]')];
+  const secs = NAV_FLAT.map(n=>document.getElementById(n.id)).filter(Boolean);
+  const bar = document.getElementById('pbar');
+  const navEl = document.querySelector('nav');
+  const stripEl = document.getElementById('nstrip');
+  let cur = null, queued = false;
+
+  function sync(){
+    queued = false;
+    // 进度：以「当前视口底」相对整页可滚距离计
+    const h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? Math.min(100, Math.max(0, scrollY / h * 100)) : 0) + '%';
+    // 导航条粘顶后才显示背景（静止态透明，避免与 hero / 浮点目录互相干扰）
+    navEl.classList.toggle('stuck', navEl.getBoundingClientRect().top <= 0);
+    // 高亮：取「最后一个顶边已越过基准线」的区块。
+    // 基准线取视口上方 1/3 处；贴顶跳转时该区块顶边 ≈ 0，正好命中，
+    // 而上一区块顶边 < 0 也会命中，所以要取「最后一个」而非「第一个」。
+    const line = innerHeight / 3;
+    let hit = secs[0];
+    for(const s of secs){
+      if(s.getBoundingClientRect().top <= line) hit = s; else break;
+    }
+    // 兜底：滚到底时必然命中最后一个
+    if(scrollY + innerHeight >= document.documentElement.scrollHeight - 2) hit = secs[secs.length-1];
+    if(!hit) return;
+    if(hit.id !== cur){
+      cur = hit.id;
+      links.forEach(a=>a.classList.toggle('on', a.dataset.nav === cur));
+    }
+    // 标签条内联了全部 18 项，溢出时要把当前项滚进视野。
+    // 这段必须在「区块未变」时也执行：窗口变宽变窄后即使当前区块没变，
+    // 该项也可能被挤出可视区，所以不能放在上面的 if 里面。
+    // 不用 scrollIntoView：它会把所有可滚祖先一起滚（包括页面本身），
+    // 会造成页面滚动位置莫名跳动。直接算 scrollLeft 更可控。
+    const inStrip = stripEl.querySelector('a[data-nav="'+cur+'"]');
+    if(inStrip){
+      // 用相对 strip 内容起点的坐标算，避免 offsetParent 不是 strip 时算错
+      const sr = stripEl.getBoundingClientRect();
+      const base = sr.left - stripEl.scrollLeft;
+      const ar = inStrip.getBoundingClientRect();
+      const l = ar.left - base;
+      // 目标：把当前项放到标签条正中，而不是「刚好可见」。
+      // 只滚到刚好可见的话，当前项会一直贴在右边缘，
+      // 后面几节连续切换时看起来像卡死在那里，也看不到相邻项。
+      // 两端用 clamp：第一项时滚到 0，最后一项时滚到最右，都不会越界。
+      const max = stripEl.scrollWidth - stripEl.clientWidth;
+      let target = l + ar.width / 2 - stripEl.clientWidth / 2;
+      target = Math.max(0, Math.min(target, max));
+      // 差异小于 4px 就不动，避免滚动过程中反复触发动画造成抖动
+      if(Math.abs(stripEl.scrollLeft - target) > 4) stripEl.scrollLeft = target;
+    }
+    if(window.__navEdges) window.__navEdges();
+  }
+  addEventListener('scroll', ()=>{ if(!queued){ queued = true; requestAnimationFrame(sync); } }, {passive:true});
+  addEventListener('resize', ()=>{ if(!queued){ queued = true; requestAnimationFrame(sync); } });
+  // 点击时立刻高亮，不等滚动结束
+  document.addEventListener('click', e=>{
+    const a = e.target.closest('[data-nav]'); if(!a) return;
+    cur = a.dataset.nav;
+    links.forEach(x=>x.classList.toggle('on', x.dataset.nav === cur));
+  });
+  setTimeout(sync, 60);
+})();
+
+
+/* 图表墙 */
+const fw = document.getElementById('figwall');
+fw.innerHTML = ORDER.map((fid,i)=>{
+  const f = FIG[fid];
+  const cap = f.caption || ('图 ' + (i+1));
+  const no = (cap.match(/^图\s*[\d]+[-—.][\d（）a-z\(\)]*/) || [''])[0].replace(/\s/g,'') || ('No.'+(i+1));
+  return '<figure class="fig" data-fig="'+fid+'">'+
+    '<span class="badge">'+esc(no)+'</span>'+
+    '<div class="im"><img src="'+f.th+'" alt="'+esc(cap)+'" width="'+f.w+'" height="'+f.h+'"></div>'+
+    '<figcaption><b>'+esc(cap)+'</b><span>'+esc(f.note||'点击查看原图')+'</span></figcaption></figure>';
+}).join('');
+fw.addEventListener('click',e=>{
+  const f=e.target.closest('.fig'); if(!f) return;
+  const d=FIG[f.dataset.fig];
+  document.getElementById('lbimg').src=d.big;
+  document.getElementById('lbcap').textContent=(d.caption||'')+(d.note?'　·　'+d.note:'');
+  document.getElementById('lb').classList.add('on');
+});
+
+/* 数量级榜 */
+const maxV = Math.max.apply(null, RANKS.map(r=>r.v));
+document.getElementById('rankwall').innerHTML = RANKS.map(r=>{
+  const w = Math.max(2, Math.round(r.v/maxV*100));
+  return '<div class="rank-row"><div class="rlab">'+esc(r.l)+(r.s?'<i>'+esc(r.s)+'</i>':'')+'</div>'+
+    '<div><div class="rank-bar '+esc(r.c||'')+'" style="width:'+w+'%"></div></div>'+
+    '<div class="vv '+esc(r.c==='b2'?'b':r.c==='b3'?'g':'')+'">'+esc(r.d)+'</div></div>';
+}).join('');
+
+/* 反直觉 */
+document.getElementById('mythwall').innerHTML = MYTHS.map(m=>
+  '<div class="myth"><p class="q">'+esc(m.q)+'</p><p class="a">'+esc(m.a)+'</p></div>').join('');
+
+/* 时间轴 */
+document.getElementById('tlwall').innerHTML = TL.map(t=>
+  '<div class="it"><div class="yr">'+esc(t.y)+'</div><h4>'+esc(t.t)+'</h4><p>'+esc(t.d)+'</p></div>').join('');
+
+/* 金句 */
+document.getElementById('quotewall').innerHTML = QUOTES.map(q=>
+  '<div class="qt"><p>'+esc(q.t)+'</p><cite>'+esc(q.c)+'</cite></div>').join('');
+
+/* 书成之后 */
+document.getElementById('afterwall').innerHTML = AFTER.map(t=>
+  '<div class="it"><div class="yr">'+esc(t.y)+'</div><h4>'+esc(t.t)+'</h4><p>'+esc(t.d)+'</p></div>').join('');
+
+/* 判断核对 */
+document.getElementById('vdwall').innerHTML = VERDICTS.map(v=>
+  '<div class="vd"><p class="claim">'+esc(v.c)+'</p><p class="fact">'+esc(v.f)+'</p>'+
+  '<div class="mark">核对<b>'+esc(v.m)+'</b>　'+esc(v.r)+'</div></div>').join('');
+
+/* 为什么（四层动因） */
+document.getElementById('whywall').innerHTML = WHY.map((w,i)=>
+  '<div class="wcard lv'+esc(w.lv||1)+'">'+
+  '<span class="tagline">'+esc(w.tag)+'</span>'+
+  '<h4>'+esc(w.t)+'</h4>'+
+  w.p.map(x=>'<p>'+esc(x)+'</p>').join('')+
+  (w.ev?'<div class="ev">'+w.ev.map(x=>'<b>依据</b>　'+esc(x)).join('')+'</div>':'')+
+  '</div>').join('');
+
+/* 主流说法 */
+document.getElementById('viewwall').innerHTML = VIEWS.map(v=>
+  '<div class="vcard">'+
+  '<div class="who"><b>'+esc(v.n)+'</b><span>'+esc(v.r)+'</span>'+
+  '<span class="stance '+esc(v.s3)+'">'+esc(v.s)+'</span></div>'+
+  '<q>'+esc(v.q)+'</q>'+
+  (v.c?'<p class="cmt">'+v.c+'</p>':'')+
+  '<div class="src">'+esc(v.src)+'</div></div>').join('');
+
+/* 时间锚点 */
+(function(){
+  const host=document.getElementById('anchorwall');
+  host.innerHTML += ANCHOR.map(a=>
+    '<div class="arow"><div class="ak">'+esc(a.k)+'</div>'+
+    '<div>'+esc(a.e)+'</div>'+
+    '<div class="rk '+esc(a.c)+'">'+esc(a.d)+'</div></div>').join('');
+})();
+
+/* 李稻葵判断核算 */
+document.getElementById('lgwall').innerHTML = LEDGER.map(l=>
+  '<div class="lg '+esc(l.k3||'')+'">'+
+  '<span class="verdict '+esc(l.v3)+'">'+esc(l.v)+'</span>'+
+  '<h4>'+esc(l.t)+'</h4>'+
+  l.p.map(x=>'<p>'+x+'</p>').join('')+
+  (l.ev?'<div class="ev">'+esc(l.ev)+'</div>':'')+
+  '</div>').join('');
+
+/* 当年 vs 现在 */
+document.getElementById('trkwall').innerHTML = TRACK.map(t=>
+  '<div class="trk">'+
+  '<div class="who"><span class="n">'+esc(t.n)+'</span><span class="r">'+esc(t.r)+'</span></div>'+
+  '<div class="mid">'+
+    '<div class="pair"><span class="tag a">'+esc(t.qs)+'</span>'+
+      '<p>'+esc(t.q)+'</p></div>'+
+    '<div class="pair"><span class="tag b">'+esc(t.ns)+'</span>'+
+      '<p>'+t.now+'</p></div>'+
+  '</div>'+
+  '<div class="side"><div class="dtag '+esc(t.d3)+'">'+esc(t.d)+'</div>'+
+    '<div class="note">'+esc(t.c)+'</div></div>'+
+  '</div>').join('');
+
+/* 未知清单 */
+document.getElementById('ukwall').innerHTML = UNKNOWN.map(u=>
+  '<div class="uk"><h4>'+esc(u.k)+'</h4>'+
+  '<span class="vb">'+esc(u.v)+'</span>'+
+  u.p.map(x=>'<p>'+x+'</p>').join('')+
+  '</div>').join('');
+
+/* ===== 化债的账谁在付 ===== */
+// 方案与进度（已知）
+document.getElementById('wp_plan').innerHTML = WPLAN.map(r=>
+  '<div class="wp-row"><span class="k">'+esc(r.l)+'</span>'+
+  '<span class="n">'+esc(r.n)+'</span>'+
+  '<span class="v">'+esc(r.v)+'</span></div>').join('') +
+  '<div class="wp-fn">'+esc(WPLAN_FN)+'</div>';
+
+// 四个口袋（可推断）
+document.getElementById('wp_pocket').innerHTML = WPOCKET.map(p=>
+  '<div class="pk'+(p.wide?' wide':'')+'"><h4>'+esc(p.k)+'<span>可推断</span></h4>'+
+  '<p><i>机制</i>'+esc(p.m)+'</p>'+
+  '<p><i>可查证据</i>'+esc(p.e)+'</p>'+
+  '<p class="lim">'+esc(p.c)+'</p>'+
+  '</div>').join('');
+
+// 股市数字（可观测）
+document.getElementById('wp_stock').innerHTML = WSTOCK.map(s=>
+  '<div class="nm"><span class="l">'+esc(s.l)+'<i>'+esc(s.n)+'</i></span>'+
+  '<span class="v">'+esc(s.v)+'</span></div>').join('');
+
+// 国家队操作时间线
+document.getElementById('wp_ops').innerHTML = WTOPS.map(o=>
+  '<div class="op">'+
+  '<span class="d">'+esc(o.d)+'</span>'+
+  '<span class="t">'+esc(o.t)+'</span>'+
+  '<span class="lv2 '+esc(o.lv)+'">'+(o.lv==='fact'?'份额硬数据':'含测算')+'</span>'+
+  '<p>'+esc(o.n)+'</p></div>').join('');
+
+// 7/17 各方动作
+document.getElementById('wp_july').innerHTML = WJULY.map(j=>
+  '<div class="op jul">'+
+  '<span class="who">'+esc(j.who)+'</span>'+
+  '<span class="act">'+esc(j.act)+'</span>'+
+  '<p>'+esc(j.n)+'</p></div>').join('');
+
+// 盈利测算 + 与不可知那一节的衔接
+document.getElementById('wp_profit').innerHTML =
+  '<p style="margin:0 0 9px">'+esc(WPROFIT)+'</p>'+
+  '<p style="margin:0"><b>'+esc(WPROFIT_TAIL)+'</b></p>';
+
+// 看不到的部分（不可知）—— 与前文未知清单同构，但这是「分配」问题而非「预测」问题
+document.getElementById('wp_unknown').innerHTML = WUNKNOWN.map(u=>
+  '<div class="uk"><h4>'+esc(u.k)+'</h4>'+
+  '<span class="vb">'+esc(u.v)+'</span>'+
+  u.p.map(x=>'<p>'+x+'</p>').join('')+
+  '</div>').join('');
+
+/* AI 类比 */
+document.getElementById('anwall').innerHTML = ANALOGY.map(a=>
+  '<div class="an '+esc(a.k3)+'">'+
+  '<span class="k">'+esc(a.k)+'</span>'+
+  '<span class="an-tag"></span>'+
+  a.p.map(x=>'<p>'+(x.l?'<span class="lead">'+esc(x.l)+'</span>':'')+x.x+'</p>').join('')+
+  '</div>').join('');
+
+/* 断裂路径 */
+document.getElementById('pathwall').innerHTML = PATHS.map(p=>
+  '<div class="pth"><div class="hd">'+esc(p.hd)+'</div><h4>'+esc(p.t)+'</h4>'+
+  p.p.map(x=>'<p>'+x+'</p>').join('')+
+  '<div class="chain">'+p.chain.map(c=>'<i>'+esc(c)+'</i>').join('')+'</div></div>').join('');
+
+/* AI 结论分界 */
+(function(){
+  const max = Math.max.apply(null, AIVERDICT.map(d=>d.v));
+  document.getElementById('vdbody').innerHTML = AIVERDICT.map(d=>{
+    const w = Math.max(2, Math.round(d.v/max*100));
+    return '<div class="drow"><div class="dl">'+esc(d.l)+'<i>'+esc(d.n)+'</i></div>'+
+      '<div><div class="dbar '+esc(d.c||'')+'" style="width:'+w+'%"></div></div>'+
+      '<div class="dv '+(d.c==='g'?'g':'r')+'">'+esc(d.d)+'</div></div>';
+  }).join('');
+})();
+
+/* 2026 数据表 */
+function drawTable(key, host){
+  const t = TABLES[key]; if(!t) return;
+  const max = Math.max.apply(null, t.rows.map(r=>Math.abs(r.v)));
+  let h = '<div class="dtab-cap">'+esc(t.title)+'<span>'+esc(t.sub||'')+'</span></div>';
+  h += t.rows.map(r=>{
+    const w = Math.max(2, Math.min(100, Math.round(Math.abs(r.v)/max*100)));
+    const cls = r.neg ? 'g' : (r.c||'');
+    return '<div class="drow"><div class="dl">'+esc(r.l)+(r.n?'<i>'+esc(r.n)+'</i>':'')+'</div>'+
+      '<div><div class="dbar '+esc(cls)+'" style="width:'+w+'%"></div></div>'+
+      '<div class="dv '+(r.neg?'g':r.c==='b'?'':'r')+'">'+esc(r.d)+'</div></div>';
+  }).join('');
+  if(t.note) h += '<div class="dtab-fn">'+esc(t.note)+'</div>';
+  document.getElementById(host).innerHTML = h;
+}
+drawTable('estate', 'dt_estate');
+drawTable('fiscal', 'dt_fiscal');
+drawTable('macro', 'dt_macro');
+
+/* 化债进度 */
+(function(){
+  const max = Math.max.apply(null, DEBT.map(d=>d.total));
+  document.getElementById('debtbody').innerHTML = DEBT.map(d=>{
+    const w = Math.max(2, Math.round(d.done/d.total*100));
+    return '<div class="drow"><div class="dl">'+esc(d.l)+'<i>'+esc(d.n)+'</i></div>'+
+      '<div style="position:relative;height:11px;border-radius:6px;background:#ece7de;overflow:hidden">'+
+      '<div class="dbar" style="width:'+w+'%;position:absolute;left:0;top:0;bottom:0"></div></div>'+
+      '<div class="dv">'+esc(d.d)+'</div></div>';
+  }).join('');
+})();
+
+/* 分组 */
+const GROUP_NAME = {pre:'前言',p1:'上篇 · 微观机制',p2:'上篇 · 微观机制',p3:'上篇 · 微观机制',p4:'上篇 · 微观机制',
+  p5:'下篇 · 宏观现象',p6:'下篇 · 宏观现象',p7:'下篇 · 宏观现象',p8:'总结',end:'结束语'};
+let filter='all', query='';
+const chips = [{k:'all',n:'全部'},{k:'up',n:'上篇 · 微观机制'},{k:'down',n:'下篇 · 宏观现象'},{k:'other',n:'前言 / 总结'}];
+document.getElementById('chips').innerHTML = chips.map(c=>
+  '<button class="chip'+(c.k==='all'?' on':'')+'" data-k="'+c.k+'">'+c.n+'</button>').join('');
+
+function grpOK(c){
+  const g=c.group;
+  if(filter==='all') return true;
+  if(filter==='up') return ['p1','p2','p3','p4'].includes(g);
+  if(filter==='down') return ['p5','p6','p7'].includes(g);
+  if(filter==='other') return ['pre','p8','end'].includes(g);
+  return true;
+}
+function txtOK(c){
+  if(!query) return true;
+  const s=SUMMARY[c.id]||{};
+  const hay=[c.title, s.sum, s.point, (s.kw||[]).join(' '), c.body.filter(b=>b.t==='P').map(b=>b.x).join('')].join(' ');
+  return hay.toLowerCase().includes(query.toLowerCase());
+}
+let visible=[];
+function render(){
+  visible = CH.filter(c=>grpOK(c)&&txtOK(c));
+  const el=document.getElementById('cards');
+  if(!visible.length){ el.innerHTML='<div class="empty">没有匹配的章节。换个关键词试试。</div>'; return; }
+  el.innerHTML = visible.map(c=>{
+    const s=SUMMARY[c.id]||{};
+    const figCount = ORDER.filter(f=>FIG[f].ch===c.id).length;
+    return '<div class="card" role="button" tabindex="0" data-id="'+c.id+'">'+
+      '<span class="cid">'+esc(c.id==='pre'?'前言':c.id==='end'?'结束语':c.id==='1.0'||/^\d\.0$/.test(c.id)?GROUP_NAME[c.group]:c.id)+'</span>'+
+      '<h3>'+esc(c.title.replace(/^(第[一二三四五六七八]章|第[一二三四五六七八]节)\s*/,''))+'</h3>'+
+      '<p>'+esc(s.sum||'')+'</p>'+
+      '<div class="ft"><span>'+(c.body.filter(b=>b.t==='P').length)+' 段</span>'+
+      (figCount?'<span>'+figCount+' 图</span>':'')+
+      (c.id.endsWith('.0')&&/^\d/.test(c.id)?'<span>章首</span>':'')+'</div></div>';
+  }).join('');
+}
+document.getElementById('chips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b) return;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filter=b.dataset.k; render();
+});
+let tid;
+document.getElementById('q').addEventListener('input',e=>{
+  clearTimeout(tid); tid=setTimeout(()=>{ query=e.target.value.trim(); render(); },140);
+});
+render();
+
+/* ---------- DRAWER ---------- */
+const drawer=document.getElementById('drawer'), scrim=document.getElementById('scrim');
+let cur=-1, lastFocus=null;
+function openAt(i){
+  if(i<0||i>=visible.length) return;
+  cur=i;
+  const c=visible[i], s=SUMMARY[c.id]||{};
+  document.getElementById('dcid').textContent = c.id==='pre'?'前言':c.id==='end'?'结束语':c.id;
+  document.getElementById('dtitle').textContent = c.title;
+  let h='';
+  if(s.lead) h+='<p class="lead">'+esc(s.lead)+'</p>';
+  const kv=[];
+  if(s.point) kv.push('<li><em>核心论点</em>　'+esc(s.point)+'</li>');
+  if(s.kw&&s.kw.length) kv.push('<li><em>关键词</em>　'+esc(s.kw.join(' · '))+'</li>');
+  if(kv.length) h+='<div class="kv"><b>本节要旨</b><ul>'+kv.join('')+'</ul></div>';
+  let fi=0;
+  c.body.forEach(b=>{
+    if(b.t==='P'){ h+='<p>'+esc(b.x)+'</p>'; }
+    else{
+      const nm=[]; let seen=0;
+      // 按顺序取第 fi 张图
+      for(let k=0;k<ORDER.length;k++){ if(FIG[ORDER[k]].ch===c.id){ if(seen===fi){ nm.push(ORDER[k]); break;} seen++; } }
+      fi++;
+      if(nm.length){
+        const f=FIG[nm[0]];
+        h+='<figure><img src="'+f.big+'" alt="'+esc(f.caption||'')+'" data-fig="'+nm[0]+'">'+
+           '<figcaption><b>'+esc(f.caption||'图表')+'</b>'+(f.note?'<i>'+esc(f.note)+'</i>':'')+'</figcaption></figure>';
+      }
+    }
+  });
+  document.getElementById('dbody').innerHTML=h;
+  document.getElementById('dbody').scrollTop=0;
+  drawer.classList.add('on'); scrim.classList.add('on');
+  document.body.style.overflow='hidden';
+  drawer.querySelector('.db').scrollTop=0;
+  document.getElementById('dclose').focus();
+}
+function close(){
+  drawer.classList.remove('on'); scrim.classList.remove('on');
+  document.body.style.overflow='';
+  if(lastFocus&&document.contains(lastFocus)) lastFocus.focus();
+}
+document.getElementById('cards').addEventListener('click',e=>{
+  const c=e.target.closest('.card'); if(!c) return;
+  lastFocus=c;
+  openAt(visible.findIndex(x=>x.id===c.dataset.id));
+});
+document.getElementById('cards').addEventListener('keydown',e=>{
+  const c=e.target.closest('.card'); if(!c) return;
+  if(e.key==='Enter'||e.key===' '){ e.preventDefault(); lastFocus=c; openAt(visible.findIndex(x=>x.id===c.dataset.id)); }
+});
+document.getElementById('dclose').onclick=close;
+document.getElementById('dprev').onclick=()=>openAt(cur-1);
+document.getElementById('dnext').onclick=()=>openAt(cur+1);
+scrim.onclick=close;
+document.getElementById('dbody').addEventListener('click',e=>{
+  const im=e.target.closest('img[data-fig]'); if(!im) return;
+  const d=FIG[im.dataset.fig];
+  document.getElementById('lbimg').src=d.big;
+  document.getElementById('lbcap').textContent=(d.caption||'')+(d.note?'　·　'+d.note:'');
+  document.getElementById('lb').classList.add('on');
+});
+document.addEventListener('keydown',e=>{
+  const lb=document.getElementById('lb');
+  if(e.key==='Escape'){
+    if(lb.classList.contains('on')){ lb.classList.remove('on'); return; }
+    if(drawer.classList.contains('on')) close();
+    return;
+  }
+  if(!drawer.classList.contains('on')) return;
+  if(e.key==='ArrowLeft'){ e.preventDefault(); openAt(cur-1); }
+  if(e.key==='ArrowRight'){ e.preventDefault(); openAt(cur+1); }
+});
+document.getElementById('lb').onclick=()=>document.getElementById('lb').classList.remove('on');
+
+/* 体积显示 */
+const sz=(new Blob([document.documentElement.outerHTML]).size/1024/1024).toFixed(2);
+document.getElementById('sz').textContent=sz+' MB';
+})();
+</script>
+</body>
+</html>

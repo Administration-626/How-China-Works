@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>农业改革：已落地与将实施 · 政策备忘录</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233f6b4f'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%23fff' font-family='serif'%3E农%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#f7f5f1; --panel:#fffefb; --ink:#1f1c18; --ink2:#4a433b; --ink3:#8a8076;
+  --line:#e2dcd2; --line2:#d0c7b8;
+  --ag:#3f6b4f; --ag-deep:#2e5039; --ag-bg:#eef3ef; --ag-line:#cddcd2;
+  --amber:#c4842f; --cn:#a8442a; --cn-bg:#faf1ec;
+  --shadow:0 1px 2px rgba(60,45,30,.05),0 8px 24px rgba(60,45,30,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Songti SC","SimSun","Noto Serif CJK SC",Georgia,serif;
+  font-size:15px;line-height:1.8;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,.sans{font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:0 26px}
+
+/* hero */
+.hero{padding:68px 0 44px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;left:-80px;top:-90px;width:320px;height:320px;
+  background:radial-gradient(circle,rgba(63,107,79,.09),transparent 68%);border-radius:50%}
+.hero::after{content:"";position:absolute;right:-90px;bottom:-110px;width:340px;height:340px;
+  background:radial-gradient(circle,rgba(196,132,47,.08),transparent 68%);border-radius:50%}
+.hero .kicker{font-size:12.5px;letter-spacing:.24em;color:var(--ink3);margin:0 0 18px;font-weight:600}
+.hero .kicker b{color:var(--ag);font-weight:600}
+.hero h1{font-size:clamp(32px,5vw,52px);line-height:1.18;margin:0 0 10px;letter-spacing:-.02em;font-weight:800}
+.hero h1 .ag{color:var(--ag)}
+.hero .sub{font-size:clamp(15px,1.9vw,18.5px);color:var(--ink2);margin:0 0 24px;max-width:44em}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;padding-top:16px;border-top:1px dashed var(--line2)}
+.hero .meta b{color:var(--ink2);font-weight:600}
+.thesis{margin:26px 0 0;padding:20px 24px;background:var(--panel);border-left:3px solid var(--ag);
+  border-radius:0 12px 12px 0;box-shadow:var(--shadow);font-size:16px;line-height:1.9;color:var(--ink2)}
+.thesis em{font-style:normal;color:var(--ag-deep);font-weight:700}
+.thesis .src{display:block;margin-top:8px;font-size:12.5px;color:var(--ink3);
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* nav */
+nav{position:sticky;top:0;z-index:40;background:rgba(247,245,241,.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:2px;padding-top:8px;padding-bottom:8px;overflow-x:auto;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{font-size:13.5px;color:var(--ink2);text-decoration:none;padding:6px 12px;border-radius:8px;white-space:nowrap;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;transition:.16s;flex:none}
+nav a:hover{background:#ece7de;color:var(--ag)}
+nav .sp{flex:1}
+nav .back{color:var(--ink3)}
+
+/* sections */
+section{padding:60px 0 10px}
+.sec-head{margin-bottom:26px}
+.sec-head .no{font-size:12px;letter-spacing:.2em;color:var(--amber);font-weight:700;margin:0 0 8px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.sec-head h2{font-size:clamp(23px,3.2vw,32px);margin:0 0 8px;font-weight:800;letter-spacing:-.01em}
+.sec-head p{margin:0;color:var(--ink2);max-width:52em}
+
+/* stats strip */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin:6px 0 14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 16px 13px;box-shadow:var(--shadow)}
+.stat .v{font-size:clamp(19px,2.3vw,25px);font-weight:800;color:var(--ag-deep);line-height:1.2;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.stat .v small{font-size:.55em;font-weight:600;color:var(--ag)}
+.stat .k{font-size:12.5px;color:var(--ink3);margin-top:6px;line-height:1.5;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* done cards */
+.done{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px 20px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:var(--ag)}
+.card h3{margin:0 0 4px;font-size:19px;font-weight:800}
+.card .tag{font-size:12px;letter-spacing:.14em;color:var(--ag);font-weight:700;margin:0 0 10px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.card p{margin:0 0 10px;color:var(--ink2);font-size:14.5px}
+.card p b{color:var(--ink)}
+.card q{quotes:"「" "」";color:var(--ag-deep)}
+.card .where{display:block;font-size:12px;color:var(--ink3);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.card.fail::before{background:var(--cn)}
+.card.fail .tag{color:var(--cn)}
+.card.fail .stat-line{font-size:12.5px;color:var(--cn);font-weight:700;margin:0 0 10px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* future timeline */
+.future{position:relative;margin-top:8px}
+.frow{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:20px 0;border-bottom:1px dashed var(--line2)}
+.frow:last-child{border-bottom:none}
+.frow .when{font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.frow .when .d{font-size:17px;font-weight:800;color:var(--ag-deep);line-height:1.3}
+.frow .when .s{font-size:12px;color:var(--ink3);margin-top:4px}
+.frow h3{margin:0 0 6px;font-size:17.5px;font-weight:800}
+.frow p{margin:0 0 8px;color:var(--ink2);font-size:14.5px}
+.frow .pill{display:inline-block;font-size:12px;color:var(--ag-deep);background:var(--ag-bg);
+  border:1px solid var(--ag-line);border-radius:99px;padding:2px 10px;margin:2px 6px 2px 0;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+
+/* analysis */
+.shift{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:6px}
+.sh{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow)}
+.sh .arrow{font-size:12px;letter-spacing:.14em;color:var(--amber);font-weight:700;margin:0 0 8px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.sh h3{margin:0 0 10px;font-size:18px;font-weight:800}
+.sh p{margin:0 0 10px;color:var(--ink2);font-size:14.2px}
+.sh .ref{border-top:1px dashed var(--line2);padding-top:10px;font-size:13px;color:var(--cn);line-height:1.7}
+.sh .ref b{font-weight:700}
+.watch{margin-top:22px;padding:18px 22px;background:var(--cn-bg);border-left:3px solid var(--cn);
+  border-radius:0 12px 12px 0;font-size:14.5px;color:var(--ink2)}
+.watch b{color:var(--cn)}
+
+/* impact */
+.impact-lead{margin:2px 0 22px;padding:18px 22px;background:var(--ag-bg);border-left:3px solid var(--ag);
+  border-radius:0 12px 12px 0;font-size:15.5px;line-height:1.9;color:var(--ink2)}
+.impact-lead b{color:var(--ag-deep)}
+.imp{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.im{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow)}
+.im .who{font-size:12px;letter-spacing:.14em;color:var(--amber);font-weight:700;margin:0 0 8px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.im h3{margin:0 0 10px;font-size:18px;font-weight:800}
+.im p{margin:0 0 10px;color:var(--ink2);font-size:14.2px}
+.im p:last-child{margin-bottom:0}
+.im p b{color:var(--ink)}
+.im-risk{margin-top:20px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--cn);
+  border-radius:0 12px 12px 0;padding:18px 22px;font-size:14.5px;color:var(--ink2);line-height:1.9}
+.im-risk b{color:var(--cn)}
+
+/* sources */
+.srcs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.src-item{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:14px}
+.src-item .t{font-weight:700;margin:0 0 2px}
+.src-item .m{font-size:12.5px;color:var(--ink3);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.veri{margin-top:16px;font-size:13px;color:var(--ink3);line-height:1.8}
+
+footer{padding:36px 0 44px;color:var(--ink3);font-size:13px;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+footer a{color:var(--ag);text-decoration:none}
+footer a:hover{text-decoration:underline}
+
+@media(max-width:860px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .done,.srcs,.imp{grid-template-columns:1fr}
+  .shift{grid-template-columns:1fr}
+  .frow{grid-template-columns:1fr;gap:6px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">政策备忘录 · <b>POLICY MEMO</b> · 2026 年 10 月</p>
+    <h1>农业改革：<span class="ag">已落地</span>与<span class="ag">将实施</span></h1>
+    <p class="sub">以 2025、2026 两份中央一号文件和《农村集体经济组织法》为骨架，梳理过去两年已经落地的农村改革，以及未来几年有明确排期的政策动作。</p>
+    <div class="thesis">
+      新形势下深化农村改革，主线仍是<em>处理好农民和土地的关系</em>——承包地延包、宅基地盘活、集体建设用地入市，都是这条主线在不同地块上的展开。
+      <span class="src">—— 2026 年中央一号文件起草组解读（新华社，2026 年 2 月）</span>
+    </div>
+    <div class="meta">
+      <span><b>编制</b>2026-10-16</span>
+      <span><b>依据</b>2025 / 2026 中央一号文件 · 农村集体经济组织法 · 千亿斤产能行动方案 · 种业振兴行动方案</span>
+      <span><b>性质</b>公开政策梳理，全部引文可溯源</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#done">一 · 已落地</a>
+    <a href="#future">二 · 将实施</a>
+    <a href="#analysis">三 · 结构分析</a>
+    <a href="#impact">四 · 意味着什么</a>
+    <a href="#fall">五 · 退潮史对照</a>
+    <a href="#verdict">六 · 总评</a>
+    <a href="#srcs">来源与校验</a>
+    <span class="sp"></span>
+    <a class="back" href="index.html">← 置身事内图谱</a>
+    <a class="back" href="riji.html">← 以日为鉴精讲</a>
+    <a class="back" href="compare.html">← 两书对比页</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<section id="top">
+  <div class="stats">
+    <div class="stat"><div class="v">1.4<small>万亿斤</small></div><div class="k">粮食产量目标（2026 年一号文件）</div></div>
+    <div class="stat"><div class="v">14130<small>亿斤</small></div><div class="k">2024 年实际产量，首破 1.4 万亿斤</div></div>
+    <div class="stat"><div class="v">1.6<small>亿户</small></div><div class="k">"十五五"期间承包到期、需延包的农户</div></div>
+    <div class="stat"><div class="v">24456<small>元</small></div><div class="k">"十四五"末农村居民人均可支配收入</div></div>
+    <div class="stat"><div class="v">420<small>公斤/亩</small></div><div class="k">2030 年粮食单产目标</div></div>
+    <div class="stat"><div class="v">720<small>个</small></div><div class="k">全国粮食产能提升重点县</div></div>
+  </div>
+</section>
+
+<section id="done">
+  <div class="sec-head">
+    <p class="no">第一部分 · 2024 — 2026</p>
+    <h2>已经落地的六件事</h2>
+    <p>从"确权"进入"延期 + 盘活 + 入市"。以下每一条都对应已发布的文件原文或官方发布会表态。</p>
+  </div>
+  <div class="done">
+    <div class="card">
+      <p class="tag">承包地 · 土地制度</p>
+      <h3>二轮承包到期后再延三十年</h3>
+      <p>农村土地从 1997 年前后开始的第二轮承包正陆续到期。改革做法是整体续期：2024 年安徽、湖南、广西三个整省试点起步，2025 年扩大范围（四川、江苏等跟进），2026 年一号文件改为<q>全面开展第二轮土地承包到期后再延长三十年整省试点</q>。总原则<q>大稳定、小调整</q>，绝大多数农户承包地总体顺延，不打乱重分。</p>
+      <span class="where">出处：2024–2026 年一号文件及延包试点部署</span>
+    </div>
+    <div class="card">
+      <p class="tag">宅基地 · 严管 + 盘活</p>
+      <h3>允许盘活，两条红线</h3>
+      <p>允许农户合法拥有的住房通过出租、入股、合作等方式盘活利用，扎实做好房地一体确权登记颁证。同时明确两条不许碰的底线：<q>不允许城镇居民到农村购买农房、宅基地，不允许退休干部到农村占地建房</q>。</p>
+      <span class="where">出处：二十届三中全会《决定》授权 + 2025 年一号文件国新办发布会</span>
+    </div>
+    <div class="card">
+      <p class="tag">集体建设用地 · 入市</p>
+      <h3>集体经营性建设用地入市</h3>
+      <p>村里的经营性建设用地可以不经过国家征收、直接入市交易。<q>有序推进农村集体经营性建设用地入市，支持符合条件的入市土地依法依规用于发展集体经济和乡村产业，激活农村土地资产价值</q>；重点是健全收益分配和权益保护机制。</p>
+      <span class="where">出处：2026 年一号文件"强化体制机制创新"部分</span>
+    </div>
+    <div class="card">
+      <p class="tag">流转 · 纠偏</p>
+      <h3>不许行政强推土地流转</h3>
+      <p>针对有的地方把流转率纳入考核、下指标定任务的做法，中央明确：流转不流转、价格怎么定，决定权在农户，<q>不能通过下指标、定任务等方式推动，更不能依靠行政手段强行流转农民土地</q>；同时对长时间、大面积流转建立风险监测预警。</p>
+      <span class="where">出处：2026 年一号文件起草组解读；2025 年国新办发布会同样点名纠偏</span>
+    </div>
+    <div class="card">
+      <p class="tag">集体经济 · 立法</p>
+      <h3>《农村集体经济组织法》施行</h3>
+      <p>2024 年 6 月 28 日通过、2025 年 5 月 1 日施行，八章 67 条。集体经济组织取得特别法人资格（可独立签约、起诉应诉，但不适用破产法）；成员身份确认有了全国统一规则，重点保护外嫁女权益；集体经营性财产的收益权可量化到成员，作为分红依据。</p>
+      <span class="where">出处：全国人大常委会法工委权威解读</span>
+    </div>
+    <div class="card">
+      <p class="tag">城乡衔接 · 户籍与权益</p>
+      <h3>进城农民"可进可退"</h3>
+      <p>推行由常住地登记户口提供基本公共服务，取消在就业地参保的户籍限制；进城落户农民的土地承包权、宅基地使用权、集体收益分配权依法保留，探索自愿有偿退出。<q>农民在城里还没有彻底扎根之前，不要急着断了他们在农村的后路</q>。</p>
+      <span class="where">出处：2025 年一号文件 + 国新办发布会（中央财办）</span>
+    </div>
+  </div>
+</section>
+
+<section id="future">
+  <div class="sec-head">
+    <p class="no">第二部分 · 2026 年起</p>
+    <h2>将来要实施的：有明确排期的动作</h2>
+    <p>按时间从近到远排列。已部署、正在铺开的标"进行中"；文件写明方向、细则待出台的标"待落地"。</p>
+  </div>
+  <div class="future">
+    <div class="frow">
+      <div class="when"><div class="d">2026 年内</div><div class="s">进行中</div></div>
+      <div>
+        <h3>延包整省试点全面铺开 + 农村基层组织集中换届</h3>
+        <p>延包从"试点"转为"全面开展"，"十五五"期间约 1.6 亿户承包将集中到期续期。同年农村基层组织集中换届选举，选优配强乡镇领导班子和村"两委"带头人。</p>
+        <span class="pill">约 1.6 亿户延包</span><span class="pill">大稳定、小调整</span><span class="pill">基层组织换届</span>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="when"><div class="d">2026–2027</div><div class="s">待落地</div></div>
+      <div>
+        <h3>两项配套细则预计出台</h3>
+        <p>一是集体经营性建设用地入市的"下一步改革举措"——2025 年官方已表态有关部门正在研究，重点是健全收益分配和权益保护机制；二是过渡期后帮扶政策体系——2025 年部署"研究制定过渡期后帮扶政策体系"，官方明确过渡期结束之后帮扶政策不会"急刹车"，将建立常态化防返贫致贫的制度机制。</p>
+        <span class="pill">入市收益分配办法</span><span class="pill">常态化帮扶体系</span>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="when"><div class="d">2026–2030</div><div class="s">进行中</div></div>
+      <div>
+        <h3>新一轮千亿斤粮食产能提升行动收官</h3>
+        <p>《新一轮千亿斤粮食产能提升行动方案（2024—2030 年）》提出<q>到 2030 年实现新增粮食产能千亿斤以上</q>；粮食播种面积稳定在 17.5 亿亩左右、谷物 14.5 亿亩左右，单产达到每亩 420 公斤左右；增产重点放在玉米和大豆，配套 9 项支撑性重大工程，落到 720 个产能提升重点县。</p>
+        <span class="pill">+1000 亿斤产能</span><span class="pill">17.5 亿亩</span><span class="pill">单产 420 公斤</span><span class="pill">720 个重点县</span>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="when"><div class="d">2026–2030</div><div class="s">进行中</div></div>
+      <div>
+        <h3>种业振兴进入"十年突破"冲刺</h3>
+        <p>2021 年《种业振兴行动方案》按<q>一年开好头、三年打基础、五年见成效、十年实现重大突破</q>推进，官方判断目前已从"打基础、见成效"迈向"十年实现重大突破的新阶段"。2026 年一号文件要求<q>深入实施种业振兴行动，加快选育和推广突破性品种，推进生物育种产业化</q>；转基因玉米大豆产业化试点已显示玉米增产 8% 左右，下一步扩面。</p>
+        <span class="pill">生物育种产业化</span><span class="pill">突破性品种</span>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="when"><div class="d">常态运行</div><div class="s">机制已启动</div></div>
+      <div>
+        <h3>粮食产销区省际横向利益补偿</h3>
+        <p>2025 年启动、中央统筹：通过"受益"省份出资、"贡献"省份获得补偿的方式，把主产区长期承担的粮食安全义务变成可结算的利益关系；同时扩大稻谷、小麦、玉米、大豆完全成本保险和种植收入保险投保面积。这是纵向财政转移之外新开的一条横向通道。</p>
+        <span class="pill">省际横向补偿</span><span class="pill">完全成本保险扩面</span>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="when"><div class="d">至 2035</div><div class="s">远景</div></div>
+      <div>
+        <h3>种源自主可控与"农村基本具备现代生活条件"</h3>
+        <p>种业振兴的最终目标：到 2035 年实现种业科技自立自强、种源自主可控。2026 年一号文件提出的总目标<q>努力把农业建成现代化大产业、使农村基本具备现代生活条件、让农民生活更加富裕美好</q>，同样以 2035 年基本实现社会主义现代化为坐标。技术抓手包括<q>拓展无人机、物联网、机器人等应用场景</q>——无人机和机器人系首次写入一号文件。</p>
+        <span class="pill">种源自主可控</span><span class="pill">农业新质生产力</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="analysis">
+  <div class="sec-head">
+    <p class="no">第三部分 · 分析</p>
+    <h2>三组结构性变化：增长机器换零件</h2>
+    <p>这轮改革可以放进《置身事内》的框架读——土地财政退坡之后，"土地—人—粮食"三组关系都在换运行规则。</p>
+  </div>
+  <div class="shift">
+    <div class="sh">
+      <p class="arrow">土地 · 单轨 → 双轨</p>
+      <h3>从"征收—出让"到城乡两个轨道</h3>
+      <p>过去城市扩张靠政府垄断征地再独家出让，农村土地不能直接入市。集体经营性建设用地入市后，土地供给出现第二轨道；承包权延包三十年，则让经营主体敢在农地上做长期投入。</p>
+      <div class="ref"><b>对照</b>《置身事内》2.2「土地财政」：土地财政的实质是政府以征地—出让差价支撑基建与财政，入市双轨正是对这一模式的边际改造。</div>
+    </div>
+    <div class="sh">
+      <p class="arrow">人 · 户籍 → 常住地</p>
+      <h3>福利与户籍脱钩，后路不切断</h3>
+      <p>常住地登记户口提供基本公共服务、取消就业地参保户籍限制，是让公共服务跟人走而不是跟户口走；进城农民保留"三权"并探索自愿有偿退出，保留了城乡之间双向选择的余地。</p>
+      <div class="ref"><b>对照</b>《置身事内》5.2「不平衡与要素市场改革」：人、地、钱在空间上的错配是区域不平衡的制度根源，常住地服务正是要素流动的配套。</div>
+    </div>
+    <div class="sh">
+      <p class="arrow">粮 · 义务 → 结算</p>
+      <h3>主产区从"财政输血"到"省际算账"</h3>
+      <p>主产区抓粮长期靠中央转移支付（纵向）补偿，激励不足。省际横向利益补偿把"谁吃粮谁掏钱"变成省份之间的直接结算，与完全成本保险一起构成新的种粮收益保障。</p>
+      <div class="ref"><b>对照</b>《置身事内》2.3「纵向不平衡与横向不平衡」：纵向转移支付覆盖不了地区间的外部性，横向补偿是制度补丁。</div>
+    </div>
+  </div>
+  <div class="watch">
+    <b>落地观察指标（四个数）</b>：① 延包合同签订率与纠纷化解量；② 集体经营性建设用地入市宗数与成交均价；③ 省际横向利益补偿资金实际拨付规模；④ 生物育种品种审定数与推广面积。这四个数是检验"文件"变成"事实"的进度条。
+  </div>
+</section>
+
+<section id="impact">
+  <div class="sec-head">
+    <p class="no">第四部分 · 影响与含义</p>
+    <h2>这套改革意味着什么</h2>
+    <p>按"谁受影响、机制是什么"分层展开。文件、法律、试点范围是已发生的事实；下面的效果链是基于机制的分析推断，全部依赖执行。</p>
+  </div>
+  <div class="impact-lead">
+    <b>一句话结论</b>：国家把粮食安全从行政压任务换成可结算的利益制度，把农民与土地的关系从城市化的燃料换成可携带的长期产权。土地财政退坡之后，乡村第一次从被提取的一方，转向被结算、被盘活的一方。
+  </div>
+  <div class="imp">
+    <div class="im">
+      <p class="who">农民 · 承包权</p>
+      <h3>从资格变成准产权</h3>
+      <p>延包是整轮改革的锚。二轮承包期内，承包地名义上还可能到期调整；整省试点全面铺开后，承包权事实续期到 2050 年代，大稳定、小调整，不打乱重分。</p>
+      <p>这意味着三件事：<b>流转市场有了定价锚</b>，租金期限可以拉长，经营主体敢在农地上投入设施和地力；<b>征地、补偿谈判中农民的谈判地位更稳</b>；为后面的大规模流转铺路——"十五五"1.6 亿户集中到期，先把权利锁死，流转才有合法的底座。</p>
+      <p>代价也明确：宅基地只开收益权（出租、入股、合作），不开所有权流动（两条红线）——农民能收租金、不能整笔变现，农房卖不出市价。这是防资本下乡圈地的有意设计，不是疏漏。</p>
+    </div>
+    <div class="im">
+      <p class="who">地方政府 · 土地财政</p>
+      <h3>从唯一卖家到收税者加规则制定者</h3>
+      <p>集体经营性建设用地入市后，土地增值收益的分配从政府拿大头转向集体与农民分享，地方土地财政收入的基础继续收缩，倒逼地方税体系改革——《置身事内》第八章政府转型的现实版。</p>
+      <p>省际横向利益补偿同时改变主产区的财政逻辑：抓粮从政治任务加亏损，变成有销区直接掏钱的公共服务。本质是财政责任在政府间的再分解——中央把一部分补偿责任下放给受益省，而不是全靠中央转移支付兜底。</p>
+    </div>
+    <div class="im">
+      <p class="who">粮食体系 · 保障方式</p>
+      <h3>从保面积到保产能、保收入</h3>
+      <p>千亿斤产能行动、单产 420 公斤目标、完全成本保险三件事拼起来看：国家承认了靠天吃饭和价格波动的现实，把托底方式从行政压面积，换成保险保收入、补偿保产区。</p>
+      <p>大食物观把供给口径从谷物扩到肉蛋奶、设施农业、森林海洋食品，实际是给大豆玉米的进口依赖找多元化的缓解路径。</p>
+    </div>
+    <div class="im">
+      <p class="who">宏观经济 · 两项基础设施</p>
+      <h3>产权与人口，各补一块底座</h3>
+      <p>《农村集体经济组织法》补的是产权基础设施——没有特别法人和成员确认规则，入市收益无法合法分到个人，农民变股东就只是口号；有了它，集体资产才有可交易、可分配的法律载体。</p>
+      <p>常住地公共服务补的是人口基础设施——劳动力城市化不再被教育医保绑在户籍上，人口继续向都市圈集中，乡村人地比改善反过来让规模化经营变得可行。两项基础设施叠上延包，就是未来十年农业规模化和农民财产性收入的前提条件。</p>
+    </div>
+  </div>
+  <div class="im-risk">
+    <b>对普通人的边界与通道</b>：对城市居民，下乡置业的合法边界划定为使用权层——不能买宅基地和农房，但可以租、可以合作开民宿，文旅投资通道开着；对年轻人，政策在造乡村就业的第二曲线（农创客、超千万返乡创业基数），但参照《以日为鉴》篇三的教训——赛道成立与否取决于产业是否真实存在，不取决于文件。
+  </div>
+  <div class="im-risk">
+    <b>风险与执行依赖</b>：入市会不会放量，取决于尚未出台的收益分配办法（地方有动力也有顾虑，2026–2027 是观察窗）；自愿有偿退出的补偿定价机制还没有统一规则；集体经济组织不适用破产法，基层干部代行集体资产控制权的老问题，法律给了撤销诉讼、代位诉讼等救济渠道，执行效果看地方。
+  </div>
+  <div class="im-risk">
+    <b>时间尺度</b>：短期（一两年）看稳预期——延包定心丸、帮扶不断档；中期（三五年）看机制切换——入市宗数、横向补偿拨付、保险覆盖面；长期（十年）看结构——产权、人口、财政三组关系的重构。第三部分末尾的四个观察指标，就是这三个时间尺度的进度条。
+  </div>
+</section>
+
+<section id="fall">
+  <div class="sec-head">
+    <p class="no">第五部分 · 反面清单</p>
+    <h2>文件不等于结果：六次退潮的对照</h2>
+    <p>第四部分读的是文件的意图与激励，不是结果。过去十年至少有六次全国性政策浪潮，声势与本轮相当甚至更大，结局是急转弯、冷却或清零——成本大多落在相信政策的普通人头上。列出来，是为了给前面的分析划红线。</p>
+  </div>
+  <div class="done">
+    <div class="card fail">
+      <p class="tag">地摊经济 · 2020 · 热约一个月</p>
+      <h3>从总理点名到无声退场</h3>
+      <p>2020 年 3 月成都推出<q>五允许一坚持</q>放开占道经营；5 月 26 日中央文明办明确不将占道经营、流动商贩列为文明城市测评考核内容；5 月 28 日总理记者会专门表扬成都<q>设置了3.6万个流动商贩的摊位，结果一夜之间有10万人就业</q>。舆情 6 月 4 日达到顶峰。</p>
+      <p>转向同样快：6 月 6 日《北京日报》刊文《"地摊经济"不适合北京》，6 月 8 日《深圳特区报》称不宜一哄而上。此后没有正式废止文件，宣传退潮，多数城市恢复原市容管理。前期购置餐车、囤货入场的摊主，自担沉没成本。</p>
+    </div>
+    <div class="card fail">
+      <p class="tag">P2P 网贷 · 2013 起势 · 2020 归零</p>
+      <h3>七年一万多家，清零一纸之间</h3>
+      <p>P2P 曾被当作普惠金融创新鼓励发展。据银保监会主席郭树清 2020 年 12 月披露：过去 14 年先后有 1 万多家 P2P 上线，高峰期 5000 多家同时运营，年交易规模约 3 万亿元。</p>
+      <p>2020 年 11 月 27 日，银保监会首席律师刘福寿宣布：全国实际运营的 P2P 网贷机构到当年 11 月中旬完全归零。爆雷平台的出借人损失自行承担。鼓励入场时的口径是创新，清退时的口径是乱象——同一个人群，两头受损。</p>
+    </div>
+    <div class="card fail">
+      <p class="tag">特色小镇 · 2016—2019 集中纠偏</p>
+      <h3>目标 1000 个，两年冲上 2000，四成被淘汰</h3>
+      <p>2016 年 7 月住建部等三部委发文，到 2020 年培育 1000 个左右特色小镇。配套专项建设基金和财政奖励，各地一哄而上：截至 2018 年初全国试点 403 个，加省级创建数量超过 2000 个，大量项目房地产化、烂尾、空壳。</p>
+      <p>2019 年 7 月国家发改委公布 419 个"问题小镇"淘汰整改（含各地省级创建名单在内）；此前 2018 年底，原 403 个"全国特色小镇"已整体更名为"特色小城镇"降温。纠偏是对的，但被套牢的是地方债务和入场企业。</p>
+    </div>
+    <div class="card fail">
+      <p class="tag">双减与教培 · 2021</p>
+      <h3>一个合法行业一年内基本消失</h3>
+      <p>2021 年 7 月"双减"文件出台，义务教育阶段学科类校外培训从数百万从业者、万亿级收入的行业一夜转为受限行业，头部公司市值蒸发九成以上，从业机构关停或转型。政策方向有民意基础，但它立了一个先例：一纸文件可以在一年内让一个完全合法的行业消失。</p>
+      <p>对照意义在于：本轮农业改革里，任何"预期"都必须打折评估——教培从业者当年也曾以为行业足够合法、足够大。</p>
+    </div>
+    <div class="card fail">
+      <p class="tag">煤改气 · 2017 冬</p>
+      <h3>禁煤先于气源到位</h3>
+      <p>北方清洁取暖工程在部分农村地区先禁煤、后通网，2017 年冬天河北等地气源紧张，部分村民整冬无法正常取暖。随后政策口径调整为<q>宜气则气、宜电则电、宜煤则煤</q>的分类施策，不再一刀切。方向长期正确，执行当冬受苦的是农户。</p>
+    </div>
+    <div class="card fail">
+      <p class="tag">耕地用途的来回摆动 · 2014—2023 · 最贴题</p>
+      <h3>鼓励调结构在前，强行复耕在后</h3>
+      <p>前一阶段不少地方鼓励调整种植结构：种苗木草皮、挖塘养鱼养虾。后一阶段耕地"非粮化"整治又要求退出恢复种粮，2023 年部分地方出现强行拔苗砍树、填坑平塘。农业农村部 2023 年 6 月答记者问承认存在这些行为，并要求<q>严禁不顾果树处于盛果期、林木处于成林期、鱼塘处于收获季等客观实际，强行拔苗砍树，填坑平塘</q>；官方同时声明"退林还耕"并不是政策名称。</p>
+      <p>两轮方向相反的政策之间，种树养鱼的投入都由农户自担。这是农业领域自己的退潮案例，距离现在只有三年。</p>
+    </div>
+  </div>
+  <div class="shift" style="margin-top:22px">
+    <div class="sh">
+      <p class="arrow">制度型 · 反转成本最高</p>
+      <h3>较难取消，怕的是打折执行</h3>
+      <p>承包地延包是给 1.6 亿户续签合同，反转等于国家层面违约，退路已经封死；《农村集体经济组织法》是立法，修改需要走完整立法程序。这两项是本轮里最接近"不可逆"的部分。风险不在取消，在执行走样——发放合同时加条件、确权时留尾巴。</p>
+    </div>
+    <div class="sh">
+      <p class="arrow">预算型 · 看钱说话</p>
+      <h3>钱到就转，财政紧就缩</h3>
+      <p>省际横向利益补偿、完全成本保险、千亿斤产能工程，全部靠真金白银运转。它们的存续不取决于文件语气，取决于地方财政和中央预算的宽紧。判断依据是拨付数、承保面积、工程实物量——不是发布会的形容词。</p>
+    </div>
+    <div class="sh">
+      <p class="arrow">口号型 · 最易蒸发</p>
+      <h3>声量最大，可核验性最低</h3>
+      <p>大食物观、农业新质生产力、种业十年重大突破、无人机机器人写入一号文件——这类目标与特色小镇的"培育 1000 个"同构：数字响亮、缺乏中期问责节点。十年后"重大突破"是否兑现，大概率无人对照验收。对这四项，文件措辞的权重应打最大折扣。</p>
+    </div>
+  </div>
+  <div class="watch" style="margin-top:20px">
+    <b>本页的诚实口径</b>：第一到四部分回答的是"国家想做什么、激励怎么改"，第五部分提醒"想做什么"和"做成了什么"之间隔着执行与时间。还有一条反向证据值得注意：中央两度下场纠偏（禁止把流转率当政绩指标、禁止强行拔苗砍树），纠偏文件本身就是地方变形真实存在的病历——凡是有纠偏条款的政策，说明变形已经是普遍现象。判断结果，只认第三部分末尾那四个硬指标和拨付数据。
+  </div>
+</section>
+
+<section id="verdict">
+  <div class="sec-head">
+    <p class="no">第六部分 · 总评</p>
+    <h2>编者评鉴：一套防守型改革</h2>
+    <p>以下是编者的独立判断，不是文件解读。判断依据：文件的诊断、药方与病因的对应关系、执行者激励、以及第五部分的历史先例。可与读者自己的判断对照。</p>
+  </div>
+  <div class="impact-lead">
+    <b>性质判断</b>：这是一套防守型改革——把能锁定的都锁定（延包）、能纠偏的都纠偏（流转、拔苗）、能补偿的都补偿（保险、横向补偿），但有意绕开了产权的根本问题（土地能否市场化配置、农民房产能否定价流动）。它大概率让农村更稳，不会让农村更富。富的通道被留在门外，是政治选择，不是疏忽。
+  </div>
+  <div class="imp">
+    <div class="im">
+      <p class="who">对症的部分</p>
+      <h3>延包是近十年农村政策里含金量最高的一件事</h3>
+      <p>1.6 亿户承包到期本身就是悬在头上的不确定性，续期锁定预期，低成本、低风险、几乎不可逆，消除的是真问题。流转纠偏同理——纠偏文件的存在，等于官方承认了过去强推流转的病灶。省际横向补偿方向正确，是三中全会少数动真格的再分配机制，但 2024 年起才是小规模试点，相对主产区数千亿量级的粮食安全成本，目前仍是象征性的。</p>
+    </div>
+    <div class="im">
+      <p class="who">错位的部分</p>
+      <h3>入市是半截子，宅基地是鸡肋</h3>
+      <p>集体经营性建设用地入市从 2015 年 15 个试点县起步（农村土地制度改革三项试点共 33 个县），十年后仍只能切增量外的一小块：土地增值的大头在农转用环节，这个环节依旧被征收—出让制度垄断。宅基地盘活只许租（法定租赁上限 20 年）、入股、合作，不许买卖定价——真想退出的进城农民退不出好价钱，真想下乡的资本算不过账。结果农村居民财产净收入长期只占可支配收入的 2.5% 左右，增收靠工资和补贴，产权逻辑的通道被焊死。</p>
+    </div>
+    <div class="im">
+      <p class="who">最大的软肋</p>
+      <h3>执行者恰是最没余力的层级</h3>
+      <p>延包、入市、补偿全部压在县乡政府身上，而土地财政退坡后，县乡正是财政收缩、最没动力花成本替农民办事的层级。第五部分的病历说明：中央目标传到基层普遍变形为最低成本执行——非粮化整治变成拔苗砍树，千亿斤产能目标同样可能变成凑面积、重复立项的数字产能。文件对此没有对策，因为问责本身就是变形的来源之一。</p>
+    </div>
+    <div class="im">
+      <p class="who">公允的两点</p>
+      <h3>渐进有它的道理，但风险是渐而不进</h3>
+      <p>两条红线不是蠢：农村社保薄弱、市民化未完成时放开宅基地买卖，就是复刻 90 年代征地潮的失地剧本——这正是《以日为鉴》里保障缺位期产权自由化的教训。但在"条件不成熟"之下，可以无限期推迟，渐进主义的历史风险恰恰是渐而不进；城乡收入比仍在 2.3 倍上下，本轮没有动它的结构性根源。</p>
+    </div>
+  </div>
+  <div class="impact-lead" style="margin-top:20px">
+    <b>读者质询的修正</b>：有读者指出——能靠种地挣钱的，只有东部、北部平原的农户，或者承包商。这个观察成立，而且比上文"农民增收 3/10"的笼统评分更准确。上文按全体农民平均打分，掩盖了地形与规模造成的分野。核实官方数据后，修正如下。
+  </div>
+  <div class="shift" style="margin-top:14px">
+    <div class="sh">
+      <p class="arrow">修正一 · 地形与规模</p>
+      <h3>种粮挣钱是有地理条件的</h3>
+      <p>第三次全国国土调查：全国 19.18 亿亩耕地中，坡度 6 度以上的占 22.7%（约 4.4 亿亩），25 度以上的陡坡地仍有 3.3%。全国 2.3 亿农户户均经营规模 7.8 亩，10 亩以下的农户 2.1 亿户；除黑龙江、吉林、内蒙古、宁夏、新疆 5 省区外，其余省份户均全部低于 10 亩——浙江 1.3 亩、广东 2.6 亩；四川丘陵农户一户地块 10 块以上、单块只有 0.4–0.5 亩，<q>巴掌田</q><q>鸡窝田</q>普遍。这种地块进不了大农机，天然与规模经济无缘。</p>
+    </div>
+    <div class="sh">
+      <p class="arrow">修正二 · 钱的流向</p>
+      <h3>种粮这门生意已经收缩到平原</h3>
+      <p>据国家发改委成本收益调查（胡培松 2024 年两会引用），2022 年三种粮食平均亩均净利润 -61.5 元——户均 7.8 亩的农户种粮货币回报接近零或为负，农民人均可支配收入里工资性收入占比已超四成，大多数农户早就不靠种地挣钱。粮食生产收缩到 13 个主产区（2023 年产量占全国 77.9%），净调出省只剩内蒙古、黑龙江、吉林、安徽、河南 5 个。官方同时承认：<q>资金项目过于向大的经营主体倾斜，向工商资本倾斜，甚至侵害了小农户的一些合法的权益</q>（中央农办韩俊，2019 国新办发布会）——补贴、高标准农田、项目信贷流向规模主体；承包商挣的是成本摊薄加政策租金，平原小农户至多收一笔租金，丘陵农户连租都租不出去（农业农村部 2021 年建撂荒台账、对丘陵撂荒地宜粮则粮宜特则特，等于官方承认丘陵撂荒普遍）。</p>
+    </div>
+    <div class="sh">
+      <p class="arrow">修正三 · 评分与结论</p>
+      <h3>增收 3/10 拆开打</h3>
+      <p>平原农户与规模经营主体：5/10——产能工程、保险、横向补偿、高标准农田对他们真实有效。丘陵山区小农：1/10——政策项目进不去，还面临垒大户挤压；对约 2 亿个 10 亩以下的农户，延包的价值是退路保险（防失地、防打乱重分），不是收入。这暴露了"渐而不进"的具体形态：政策资源投给"种地的地"，而丘陵农户的出路是"不种地的人"——就业、社保携带、随迁子女教育、宅基地退出定价，恰恰是本轮最薄的部分。</p>
+    </div>
+  </div>
+  <div class="watch" style="margin-top:20px">
+    <b>结构判断</b>：中国农业的终局是少数人种多数地——这套政策事实上在为它铺路（延包锁权 → 流转 → 规模化），但话语上仍以"小农户是基本面"回避。丘陵农业没有第二种结局，日本山地小农（高米价、兼业化、老龄化锁死）就是终局样本。对丘陵农户，唯一的判据是人是否顺畅地出去。观察指标相应加一条：⑤ 丘陵山区撂荒地台账规模与复耕率——这个数越小，反而说明人的出路越通。
+  </div>
+  <div class="shift" style="margin-top:20px">
+    <div class="sh">
+      <p class="arrow">评分 · 意图与机制</p>
+      <h3>防守动作 8 分，进攻动作 3 分</h3>
+      <p>预期稳定 8/10——延包做得到，且是大事。资源配置 4/10——入市半截子，土地仍不能跨村跨县有效配置。农民增收 3/10——财产性收入通道未开，靠保险和补偿是补贴逻辑不是产权逻辑。执行变形风险：高，已有病历。粮食安全：短期边际改善，长期押注在种业口号上。</p>
+    </div>
+    <div class="sh">
+      <p class="arrow">三年后可证伪</p>
+      <h3>四个数字定成败，不认解释</h3>
+      <p>① 延包合同实际签订率——若连防守动作都签不满，说明基层执行已经失灵。② 入市宗数与区域分布——若仍集中在少数沿海县，半截子坐实。③ 横向补偿资金十年累计规模——若不到百亿量级，机制即象征性的。④ 农民财产净收入占比——若仍停留在 2.5% 左右，产权通道未开。达标与否都是硬结论。</p>
+    </div>
+    <div class="sh">
+      <p class="arrow">一句话结论</p>
+      <h3>稳的账算得清，富的账没打算算</h3>
+      <p>这轮改革的真实标的是秩序而非增长：给 1.6 亿户一个 2050 年代前的说法，给粮食安全一套可结算的利益机制，给基层变形划几条纠偏线。以"稳"的标准它是合格的；以"富民"的标准，它把唯一能改变分配格局的工具——完整土地产权——留在了文件之外。</p>
+    </div>
+  </div>
+  <div class="impact-lead" style="margin-top:20px">
+    <b>延伸 · 少数人种多数地的世界会带来什么</b>：顺着"只有平原和承包商能靠种地挣钱"这条结构往下推，落地的影响分三路，数据均已核实。
+  </div>
+  <div class="shift" style="margin-top:14px">
+    <div class="sh">
+      <p class="arrow">对小农户 · 土地变成退路资产</p>
+      <h3>这代人的社保，就是那块不挣钱的地</h3>
+      <p>种地挣不到钱，养老金呢？2025 年城乡居民基础养老金全国最低标准提至每月 143 元，实际月人均待遇约 246 元——不到农村低保（约 600 元/月）的一半。所以丘陵老农的生活=子女转移支付+口粮田+零工。而农民工平均年龄已达 43.2 岁（2008 年 34 岁），50 岁以上的占 31.6%，本地农民工平均 46.8 岁——这批人在城市干不动后回流，靠的就是延包的地和宅基地。延包和两条红线因此不是经济政策，是这代人的社保安排；代价是撂荒扩大、空心村加速、自然村继续消失。</p>
+    </div>
+    <div class="sh">
+      <p class="arrow">对城市 · 人的出口还没修完</p>
+      <h3>还有约一亿人要从地里转移出来</h3>
+      <p>第一产业用两成多就业创造 7% 出头的增加值（国家统计公报口径），按国际标准还有约一亿农业劳动力要转出。但出口变窄了：年轻一代进了三产（农民工三产就业占 54.6%），不会回去种地；大龄农民工的就业池（建筑业占 14.3%）正在萎缩。1.32 亿进城农民工常年住在城镇，社保、子女教育不接上，就是消费的最大压抑项——中财办把提高城乡居民养老金列入扩内需清单，原因在此。市民化不只是民生，是未来十年最大的内需政策。</p>
+    </div>
+    <div class="sh">
+      <p class="arrow">对粮食 · 兜得住口粮，兜不住大豆</p>
+      <h3>米袋子无虞，肉价跟着巴西美国走</h3>
+      <p>口粮（稻谷小麦）自给率超 95%、谷物超 90%，1.4 万亿斤稳住——城市居民的米面价格有兜底，不会大涨。但大豆自给率仅 15.2%：2024 年进口 1.05 亿吨创纪录，七成以上来自巴西，两成来自美国；肉蛋奶的饲料根子在海外，供应链或关税一波动就直接打到饲料和肉价。单产路线（420 公斤/亩）的真实成本记在生态账上：黑土退化、华北地下水、化肥强度。横向补偿因此不是锦上添花——维持 77.9% 产量集中于 13 个主产区的格局，这笔钱必须付。</p>
+    </div>
+  </div>
+</section>
+
+<section id="srcs">
+  <div class="sec-head">
+    <p class="no">附录</p>
+    <h2>来源与校验</h2>
+  </div>
+  <div class="srcs">
+    <div class="src-item"><div class="t">《中共中央 国务院关于进一步深化农村改革 扎实推进乡村全面振兴的意见》</div><div class="m">2025 年中央一号文件，2025-02-23 发布；配套国新办发布会（2025-02-24）</div></div>
+    <div class="src-item"><div class="t">《中共中央 国务院关于锚定农业农村现代化 扎实推进乡村全面振兴的意见》</div><div class="m">2026 年中央一号文件，2026-02-03 发布，"十五五"首个一号文件</div></div>
+    <div class="src-item"><div class="t">《中华人民共和国农村集体经济组织法》</div><div class="m">2024-06-28 十四届全国人大常委会第十次会议通过，2025-05-01 施行</div></div>
+    <div class="src-item"><div class="t">《新一轮千亿斤粮食产能提升行动方案（2024—2030 年）》</div><div class="m">国务院印发，2024-04 公布实施细节</div></div>
+    <div class="src-item"><div class="t">《种业振兴行动方案》</div><div class="m">2021-07 中央深改委审议通过；进展口径见 2026 种子大会暨南繁硅谷论坛</div></div>
+    <div class="src-item"><div class="t">国家统计局 / 政府工作报告口径数据</div><div class="m">2024 年粮食产量 14130 亿斤；"十四五"末农村居民人均可支配收入 24456 元；农业科技进步贡献率超 64%</div></div>
+    <div class="src-item"><div class="t">第三次全国国土调查主要数据公报</div><div class="m">自然资源部等，2021-08 发布（耕地坡度与分布构成）</div></div>
+    <div class="src-item"><div class="t">国新办《关于促进小农户和现代农业发展有机衔接的意见》发布会实录</div><div class="m">2019-03-01，中央农办韩俊介绍（户均规模、小农户占比、"垒大户"表述）</div></div>
+    <div class="src-item"><div class="t">胡培松委员 2024 年两会建言</div><div class="m">13 个主产区产量占比、净调出省、亩均净利润等，引国家统计局与国家发改委《全国农产品成本收益资料汇编》</div></div>
+    <div class="src-item"><div class="t">农业农村部《关于统筹利用撂荒地促进农业生产发展的指导意见》</div><div class="m">2021-01 印发（丘陵撂荒、宜粮则粮宜特则特、撂荒台账与约谈机制）</div></div>
+    <div class="src-item"><div class="t">《北京日报》《深圳特区报》评论</div><div class="m">2020-06-06 / 2020-06-08 刊发（地摊经济口径转向）</div></div>
+    <div class="src-item"><div class="t">国家统计局《2024 年农民工监测调查报告》</div><div class="m">2025-04-30 发布（总量 29973 万、平均年龄 43.2 岁、50 岁以上占 31.6%、三产就业 54.6%）</div></div>
+    <div class="src-item"><div class="t">人社部 2025 年工作综述 / 中央财办解读中央经济工作会议</div><div class="m">2025 年基础养老金最低标准提至每月 143 元；2024 年口径月人均待遇约 246 元、约 1.8 亿人领取</div></div>
+    <div class="src-item"><div class="t">海关总署 / 农业农村部《中国农产品贸易发展报告》口径</div><div class="m">2024 年大豆进口 1.05 亿吨创新高、自给率 15.2%；粮食进口 1.58 亿吨；巴西占粮食进口 51.5%</div></div>
+  </div>
+  <p class="veri">本页所有引号内文字均逐字取自上述文件原文或官方发布会实录，未做改写；仅按引用惯例对个别截断处的句末标点作了调整。政策排期中标注"待落地"的事项（入市细则、过渡期后帮扶政策体系）截至 2026 年 10 月尚未见正式文件发布，属合理预期的前瞻项。</p>
+</section>
+
+<footer>
+  <div class="wrap">
+    相关页：<a href="index.html">《置身事内》阅读图谱</a> · <a href="compare.html">置身事内 × 以日为鉴 对比阅读</a> · <a href="riji.html">以日为鉴 精讲图谱</a> —— 本页为其政策延伸阅读。
+  </div>
+</footer>
+
+</div>
+</body>
+</html>
