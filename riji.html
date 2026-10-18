@@ -128,6 +128,14 @@ footer a{color:var(--jp);text-decoration:none}
 footer a:hover{text-decoration:underline}
 .veri{margin-top:16px;font-size:13px;color:var(--ink3);line-height:1.8}
 
+/* correction notes + 2026 block */
+.fix{margin:10px 0 0;padding:9px 13px;background:#fbf4e8;border-left:3px solid var(--amber);
+  border-radius:0 8px 8px 0;font-size:12.6px;color:var(--ink2);line-height:1.75;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+.fix b{color:#8a5a1c}
+.blk code{font-family:Consolas,Menlo,monospace;font-size:12px;background:#f2eee6;
+  border:1px solid var(--line);border-radius:4px;padding:1px 5px;color:var(--ink)}
+
 @media(max-width:860px){
   .parts{grid-template-columns:repeat(2,1fr)}
   .lec,.method,.series{grid-template-columns:1fr}
@@ -163,6 +171,7 @@ footer a:hover{text-decoration:underline}
     <a href="#p3">三 · 就业众生相</a><span class="dot"></span>
     <a href="#p4">四 · 医疗体系</a><span class="dot"></span>
     <a href="#p5">五 · 全民出海</a><span class="dot"></span>
+    <a href="#now">2026 现状</a><span class="dot"></span>
     <a href="#tl">时间线</a><span class="dot"></span>
     <a href="#method">方法与可信度</a>
     <span style="flex:1"></span>
@@ -199,14 +208,15 @@ footer a:hover{text-decoration:underline}
   <div class="lec">
     <div class="blk">
       <h3>冰河期的由来<small>第一章</small></h3>
-      <p>1991 年泡沫破裂后，厚生省的年度劳动经济报告画风突变：<q>1993年厚生省的劳动经济报告开篇便是"失业动向：各行业岗位需求持续锐减"</q>——而两年前它讨论的还是劳动力短缺。日本由此开启<q>为期十余年的就业率保卫战</q>，这段时间就是全书反复出现的"就业冰河期"。</p>
+      <p>1991 年泡沫破裂后，劳动省的年度劳动经济报告画风突变：<q>1993年厚生省的劳动经济报告开篇便是"失业动向：各行业岗位需求持续锐减"</q>——而两年前它讨论的还是劳动力短缺。日本由此开启<q>为期十余年的就业率保卫战</q>，这段时间就是全书反复出现的"就业冰河期"。</p>
       <div class="nums">
-        <div class="n"><div class="v">&lt;5<small>%</small></div><div class="k">失业率被压制的上限</div></div>
+        <div class="n"><div class="v">≈5<small>%</small></div><div class="k">失业率压制目标；2002、2003 年实际 5.4%、5.3%</div></div>
         <div class="n"><div class="v">85→55<small>%</small></div><div class="k">大学生就业率 1993→2003</div></div>
         <div class="n"><div class="v">8→40<small>万</small></div><div class="k">啃老族数量十年间</div></div>
       </div>
       <p>关键句：<q>日本在就业冰河时期虽然一直将失业率压制在5%以下，但大学生的就业率却长期低于60%。本质上，日本是以牺牲了一代大学生的发展为代价，才维持了就业市场的相对稳定。</q></p>
       <span class="where">第一章；数据源：厚生劳动省统计</span>
+      <p class="fix"><b>校正两处，引文照原文保留。</b>其一，1993 年日本是厚生省与劳动省两个省并存，《劳动经济报告》（労働経済白書）由劳动省发布，厚生省不管劳动市场；厚生劳动省 2001 年 1 月 6 日才成立。按当时建制，机构名应为「劳动省（现厚生劳动省）」。其二，「一直压在 5% 以下」与实际不符：完全失业率 2002 年 5.4%、2003 年 5.3%。把求職意欲喪失者（2003 年约 59.4 万人）加回分子后，修正失业率为 6.1%——这才是「压制」的可核对证据，不是 85% 那个数。</p>
     </div>
     <div class="blk">
       <h3>僵尸企业：最小的一笔代价<small>第一章</small></h3>
@@ -319,15 +329,59 @@ footer a:hover{text-decoration:underline}
   </div>
 </section>
 
+<section id="now">
+  <div class="sec-head">
+    <p class="no">补记 · 2026 年 10 月</p>
+    <h2>今天的状态：四个切面</h2>
+    <p>书的判断停在 2024 年。两年后再核对：就业市场、冰河世代、产业上游，以及算力基建。</p>
+  </div>
+  <div class="lec">
+    <div class="blk">
+      <h3>就业市场：总量最紧，分层照旧<small>2026 年 8 月</small></h3>
+      <div class="nums">
+        <div class="n"><div class="v">98.0<small>%</small></div><div class="k">2026 年 3 月卒大学生就职率（分母为希望就业者，历史第二高）</div></div>
+        <div class="n"><div class="v">2.5<small>%</small></div><div class="k">完全失业率，2026 年 8 月；完全失业者 180 万</div></div>
+        <div class="n"><div class="v">1.18<small>倍</small></div><div class="k">有效求人倍率，2026 年 7 月</div></div>
+      </div>
+      <p>缺工是结构性的。2026 年 5 月劳动力人口 7057 万、就业者 6882 万，均为历史最高；非劳动力人口降到 3896 万的历史低位。春斗加薪连续第三年超过 5%，企业普遍上调应届起薪。</p>
+      <p>但同一组数据里还有另一层：非正规雇员 2143 万人、正规雇员 3736 万人，非正规占 36.5%。<b>失业率 2.5% 不等于正规雇用 2.5%</b>。机制与冰河期完全一样，只是方向反过来——当年用非正规吸收冲击，现在用非正规填补缺口。</p>
+      <p class="fix"><b>口径提醒。</b>98.0% 的分母是「希望就业的毕业生」，本书 85%→55% 的分母是「全体毕业生（含升学者）」。两个数不能连线，也不能相减比较。</p>
+      <span class="where">数据源：总务省劳动力调查、文部科学省与厚生劳动省共同调查（2026 年 5 月 22 日）</span>
+    </div>
+    <div class="blk">
+      <h3>冰河世代：正职追上了，收入没追上<small>2026 年</small></h3>
+      <p>这一代人约 1700 万，指 1993 至 2004 年间进行求职活动的人，2026 年 44 到 55 岁。缺工把他们中的一部分拉回了正规雇用：正职比例已大致追平更年长的世代。但早期职业空白留下的疤痕没有消失——即使后来转正，收入仍追不上同龄人。</p>
+      <p>政策补救的规模可以量化：2019 年起的五年集中支援，转为正规雇用的只有 14.5 万人，分母是 1700 万。2026 年 4 月政府再推支援计划，重点是就业与待遇改善（伴随支援、技能重塑、公务员录用）与社会参与（蛰居支援）。</p>
+      <p>下一笔账已经能看到：男性 50 岁未婚率 25.7%（2020 年国势调查），8050 问题在扩大；这代人整体进入年金领取期后，低年金、少储蓄、无家庭三项叠加，就是所谓 2040 年问题。</p>
+      <span class="where">数据源：总务省、内阁府、厚生劳动省；《经济学人》2026 年 8 月报道</span>
+    </div>
+    <div class="blk">
+      <h3>产业：输在终端，没输在上游<small>2026 年</small></h3>
+      <p>书里说保就业「断送了日本高科技产业的未来」。这句要分层看。</p>
+      <p><b>终端与存储：输了，且早已出局。</b>2026 年二季度 HBM 份额：SK 海力士约 50%、三星约 33%、美光约 18%，日本没有席位。DRAM 第一梯队是三星与 SK 海力士，NAND 前二是 SK 海力士与三星（合计 50%），日本铠侠第三（15%）。日本最后的存储厂尔必达 2012 年破产卖给美光。</p>
+      <p><b>设备与材料：没有输，反而是卡点。</b>日本占全球半导体设备约 30% 至 32%、材料约 48%。信越加 SUMCO 占硅片 44.1%；东京应化、JSR、信越包揽光刻胶前三（合计 60.5%）；东京电子在涂胶显影约 90%；迪思科在 HBM 堆叠用的超薄减薄机上占 70% 至 80%；爱德万占 SoC 测试机约 50%、存储测试机垄断；Lasertec 的 EUV 光罩检测 100%。HBM 产量越大，这几家的订单越多。</p>
+      <span class="where">数据源：TrendForce、Counterpoint、日经 2025 年主要商品份额调查、SEAJ</span>
+    </div>
+    <div class="blk">
+      <h3>算力：钱进来了，电不够<small>2026 年</small></h3>
+      <p><b>资本层是日本少有的赢面。</b>2026 年 6 月 1 日，软银市值超过丰田，23 年来首次登顶日企；它持有 Arm 约 90% 股权（Arm 市值超 3000 亿美元），对 OpenAI 的承诺投资超过 646 亿美元、持股约 13%。AI 算力最上游的指令集 IP 与最大的模型公司，日本资本都占着位置。</p>
+      <p><b>境内基建的钱也到了。</b>超大规模云厂商对日本数据中心的承诺超过 260 亿美元：微软 100 亿（到 2029 年）、AWS 152.4 亿、甲骨文 80 亿（十年）。日本政府 2026 财年另列约 1.23 万亿日元用于半导体与 AI。</p>
+      <p><b>约束从芯片换成了电。</b>数据中心耗电预计从 2024 年约 19 TWh 增至 2034 年最多 66 TWh；东京核心区新建数据中心接电要等 5 到 10 年；2026 年 4 月起新建设施须满足 PUE 1.4。制造端仍在补课：Rapidus 的 2nm 量产排在 2027 年下半年，初期月产 6000 片；台积电熊本二厂从 6/12nm 升到 3nm，投资 170 亿美元。</p>
+      <p><b>最薄的一层是模型。</b>2019 至 2023 年日本 AI 投资约 100 亿美元，同期美国 3290 亿。2026 年 3 月乐天发布号称「日本最大」的模型，几小时内被开源社区在配置文件里查到 <code>model_type: deepseek_v3</code>，底座是 DeepSeek-V3。</p>
+      <span class="where">数据源：软银公告、微软/AWS/甲骨文投资声明、经济产业省、Rapidus、TSMC</span>
+    </div>
+  </div>
+</section>
+
 <section id="tl">
   <div class="sec-head">
     <p class="no">时间线</p>
-    <h2>日本 1989–2024：一条因果链</h2>
-    <p>琥珀色年份是书中标注的关键转折点。</p>
+    <h2>日本 1989–2026：一条因果链</h2>
+    <p>琥珀色年份是书中标注的关键转折点；2025 年起的条目为本页补记。</p>
   </div>
   <div class="tl">
     <div class="trow"><div class="y">1991</div><p>地产泡沫破裂。《研究院倍增计划》启动硕博大扩招；"科学立国"战略推进。</p></div>
-    <div class="trow"><div class="y hot">1993</div><p>厚生省报告宣告岗位需求持续锐减，"就业冰河期"开始；同年日本上市企业本土收入负增长、境内外收入增速差达 15%——出海潮启动前夜。</p></div>
+    <div class="trow"><div class="y hot">1993</div><p>劳动省报告宣告岗位需求持续锐减，"就业冰河期"开始；同年日本上市企业本土收入负增长、境内外收入增速差达 15%——出海潮启动前夜。</p></div>
     <div class="trow"><div class="y">1995</div><p>公务员报考 65 万人（泡沫期两倍多）；教育学院就业率仅 50%；乡村分流与扩招已延缓约 90 万人就业。</p></div>
     <div class="trow"><div class="y">1996</div><p>大基建停止，乡村岗位消亡，毕业生回流东京；博士扩招启动；私立硕士就业率跌破 60%。</p></div>
     <div class="trow"><div class="y hot">1997–99</div><p>亚洲金融危机连击，GDP 两度负增长；国立科研机构法人化、降本增效，研究生就业率首破 70%。</p></div>
@@ -338,6 +392,8 @@ footer a:hover{text-decoration:underline}
     <div class="trow"><div class="y">2007</div><p>校招恢复，大学生就业率回到 70%，但对冰河期世代已无意义。</p></div>
     <div class="trow"><div class="y">2018</div><p>文部省首次承认科研衰退，对"研究院倍增计划"作出官方反思。</p></div>
     <div class="trow"><div class="y hot">2024</div><p>冰河世代平均年龄超 50 岁；日本再提博士人数 20 年翻倍；同年作者判定中国境内外收入增速差 14% 触发同一信号——"中国出海元年"。</p></div>
+    <div class="trow"><div class="y">2025</div><p>Rapidus 2nm 试产线在北海道千岁运转，7 月打通 GAA 晶体管；台积电熊本一厂满产（28/22、16/12nm，月产 5 万片）。</p></div>
+    <div class="trow"><div class="y">2026</div><p>应届就职率 98.0%、完全失业率 2.5%；软银市值超丰田登顶日企；云厂商对日数据中心承诺超 260 亿美元，瓶颈从芯片转为电力。</p></div>
   </div>
 </section>
 
@@ -366,7 +422,7 @@ footer a:hover{text-decoration:underline}
     <a class="slink" href="compare.html"><p class="st">对照 · 交锋</p><h3 class="jp">置身事内 × 以日为鉴 · 对比阅读</h3><p>六个交锋、双轨时间线、三组合读路径。</p></a>
     <a class="slink" href="policy.html"><p class="st">延伸 · 当下</p><h3 class="ag">农业改革 · 政策备忘录</h3><p>已落地六件事与将实施排期（2024–2030）。</p></a>
   </div>
-  <p class="veri">校验说明：本页所有引号内文字均逐字取自《以日为鉴》EPUB 全文（已解析为 src/jp_extract/jp_full.txt），经程序比对无改写；带"数据源"标注处注明了书中给出的统计出处。作者的分析性判断（出海元年、黄金十年等）与官方统计数据已分别表述。</p>
+  <p class="veri">校验说明：本页所有引号内文字均逐字取自《以日为鉴》EPUB 全文（已解析为 src/jp_extract/jp_full.txt），经程序比对无改写；带"数据源"标注处注明了书中给出的统计出处。作者的分析性判断（出海元年、黄金十年等）与官方统计数据已分别表述。引文之外的校正与 2026 年补记以琥珀色标注，不改动引号内原文；2026 年数据均标明年月与机构。</p>
 </section>
 
 <footer>
